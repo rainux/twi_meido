@@ -1,0 +1,65 @@
+GIT
+  remote: git://github.com/rainux/twitter-stream.git
+  revision: c71555e8f0e82927f4be3a5656309f8aa0718792
+  specs:
+    twitter-stream (0.1.7)
+      eventmachine (>= 0.12.8)
+      roauth (>= 0.0.2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.0)
+    addressable (2.2.0)
+    blather (0.4.10)
+      eventmachine (>= 0.12.6)
+      nokogiri (>= 1.4.0)
+    data_objects (0.10.2)
+      addressable (~> 2.1)
+    dm-core (1.0.0)
+      addressable (~> 2.1)
+      extlib (~> 0.9.15)
+    dm-do-adapter (1.0.0)
+      data_objects (~> 0.10.1)
+      dm-core (~> 1.0.0)
+    dm-migrations (1.0.0)
+      dm-core (~> 1.0.0)
+    dm-sqlite-adapter (1.0.0)
+      dm-do-adapter (~> 1.0.0)
+      do_sqlite3 (~> 0.10.2)
+    dm-timestamps (1.0.0)
+      dm-core (~> 1.0.0)
+    do_sqlite3 (0.10.2)
+      data_objects (= 0.10.2)
+    eventmachine (0.12.10)
+    extlib (0.9.15)
+    grackle (0.1.10)
+      json
+      mime-types
+      oauth
+    hashie (0.4.0)
+    json (1.4.6)
+    mime-types (1.16)
+    nokogiri (1.4.3.1)
+    oauth (0.4.3)
+    roauth (0.0.3)
+    twitter_oauth (0.4.3)
+      json (>= 1.1.9)
+      mime-types (>= 1.16)
+      oauth (>= 0.4.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activesupport
+  blather
+  dm-core
+  dm-migrations
+  dm-sqlite-adapter
+  dm-timestamps
+  grackle
+  hashie
+  json
+  twitter-stream!
+  twitter_oauth

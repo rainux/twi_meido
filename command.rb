@@ -10,16 +10,16 @@ module TwiMeido
       )
     end
 
-    def process_message(message)
+    def process_message(user, message)
       @@commands ||= []
       @@commands.each do |command|
         match = message.body.strip.match(command.pattern)
         if match
           begin
             if match.captures.empty?
-              return command.action.call(message)
+              return command.action.call(user, message)
             else
-              return command.action.call(message, match)
+              return command.action.call(user, message, match)
             end
 
           rescue => error

@@ -2,7 +2,7 @@ module TwiMeido
   module TimelineCommands
     extend Command
 
-    define_command :reply, /^-[@r]\s*(\d+)\s*(.*)$/ do |message, params|
+    define_command :reply, /^-[@r]\s*(\d+)\s*(.*)$/ do |user, message, params|
       id = params[1]
       status = params[2]
 
@@ -17,7 +17,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご
       MESSAGE
     end
 
-    define_command :reply_all, /^-ra\s*(\d+)\s*(.*)$/ do |message, params|
+    define_command :reply_all, /^-ra\s*(\d+)\s*(.*)$/ do |user, message, params|
       id = params[1]
       status = params[2]
       in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
@@ -36,7 +36,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       MESSAGE
     end
 
-    define_command :mentions, /^-@$/ do |message|
+    define_command :mentions, /^-@$/ do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
         <<-TWEET
@@ -48,7 +48,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :direct_messages, /^-d$/ do |message|
+    define_command :direct_messages, /^-d$/ do |user, message|
       tweets = TwitterClient.direct_messages?
       tweets.collect! do |tweet|
         <<-DM
