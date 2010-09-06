@@ -103,7 +103,7 @@ EM.run do
     stream.each_item do |item|
       begin
         tweet = Hashie::Mash.new(JSON.parse(item))
-        TwiMeido.process_user_stream(user, tweet)
+        TwiMeido.process_user_stream(user.reload, tweet)
       rescue
         puts "#{$!.inspect} #{__LINE__}"
       end

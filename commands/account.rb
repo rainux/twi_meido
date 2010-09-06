@@ -57,23 +57,45 @@ Successfully bound your Twitter account, now you can:
       MESSAGE
     end
 
-    define_command :on, /^-on$/ do |user, message|
-      if TwitterStream.options[:filters].include?(user.screen_name)
-        'Real-time notification already turned on, ご主人様.'
+    define_command :on, /^-on\s*(.*)$/ do |user, message, params|
+      target = params[1].to_sym rescue nil
+
+      if User::Notifications.include?(target)
+
+        if user.notification.include?(target)
+          "Real-time notification for #{target} already turned on, ご主人様."
+        else
+          user.notification += [target]
+          user.save
+          "Real-time notification for #{target} turned on, ご主人様."
+        end
+
       else
-        TwitterStream.options[:filters] << user.screen_name
-        TwitterStream.immediate_reconnect
-        'Real-time notification turned on, ご主人様.'
+        <<-MESSAGE
+ご主人様, please use one of the following real-time notification types as parameter:
+#{User::Notifications.collect(&:to_s).join(' ')}
+        MESSAGE
       end
     end
 
-    define_command :off, /^-off$/ do |user, message|
-      if TwitterStream.options[:filters].include?(user.screen_name)
-        TwitterStream.options[:filters].delete user.screen_name
-        TwitterStream.immediate_reconnect
-        'Real-time notification turned off, ご主人様.'
+    define_command :off, /^-off\s*(.*)$/ do |user, message, params|
+      target = params[1].to_sym rescue nil
+
+      if User::Notifications.include?(target)
+
+        if user.notification.include?(target)
+          user.notification -= [target]
+          user.save
+          "Real-time notification for #{target} turned off, ご主人様."
+        else
+          "Real-time notification for #{target} already turned off, ご主人様."
+        end
+
       else
-        'Real-time notification already turned off, ご主人様.'
+        <<-MESSAGE
+ご主人様, please use one of the following real-time notification types as parameter:
+#{User::Notifications.collect(&:to_s).join(' ')}
+        MESSAGE
       end
     end
   end

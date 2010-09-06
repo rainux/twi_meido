@@ -14,6 +14,8 @@ class User
   property :updated_at,             DateTime
   property :notification,           Flag[:home, :mention, :dm], :default => [:mention, :dm]
 
+  Notifications = notification.flag_map.values
+
   def authorized?
     !oauth_token.blank? && !oauth_token_secret.blank?
   end
