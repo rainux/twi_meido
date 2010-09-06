@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'bundler/setup'
 Bundler.require
+require 'active_support/time_with_zone'
 require 'cgi'
 require 'yaml'
 
@@ -63,19 +64,20 @@ MESSAGE
     say m.from, process_message(user, m)
   end
 
-  def self.broadcast(tweet)
-    client.roster.each do |jid, roster_item|
-      user = User.first_or_create(:email => jid.to_s)
-      if user.screen_name.blank? ||
-        !tweet.text.downcase.include?(user.screen_name.downcase)
-        next
+  def self.process_user_stream(user, tweet)
+    if tweet.entities
+      if user.notification.include?(:home)
+        say user.email, format_tweet(tweet)
+
+      elsif user.notification.include?(:mention) &&
+        tweet.entities.user_mentions.collect(&:screen_name).include?(user.screen_name)
+
+        say user.email, format_tweet(tweet)
       end
 
-      begin
-        say jid, format_tweet(tweet)
-      rescue
-        p $!
-      end
+    elsif tweet.direct_message && user.notification.include?(:dm) &&
+      tweet.direct_message.sender.screen_name != user.screen_name
+      say user.email, format_tweet(tweet)
     end
   end
 end
@@ -83,17 +85,30 @@ end
 EM.run do
   TwiMeido.run
 
-  TwitterStream = Twitter::JSONStream.connect(
-    :filters => User.all.collect(&:screen_name),
-    :auth => "#{AppConfig.twitter.username}:#{AppConfig.twitter.password}"
-  )
+  UserStreams = User.all.collect do |user|
+    next unless user.authorized?
 
-  TwitterStream.each_item do |item|
-    begin
-      tweet = Hashie::Mash.new(JSON.parse(item))
-      TwiMeido.broadcast(tweet)
-    rescue
-      p $!
+    stream = Twitter::JSONStream.connect(
+      :host => 'betastream.twitter.com',
+      :path => '/2b/user.json',
+      :ssl => true,
+      :oauth => {
+        :consumer_key => AppConfig.twitter.consumer_key,
+        :consumer_secret => AppConfig.twitter.consumer_secret,
+        :access_key      => user.oauth_token,
+        :access_secret   => user.oauth_token_secret
+      }
+    )
+
+    stream.each_item do |item|
+      begin
+        tweet = Hashie::Mash.new(JSON.parse(item))
+        TwiMeido.process_user_stream(user, tweet)
+      rescue
+        puts "#{$!.inspect} #{__LINE__}"
+      end
     end
+
+    stream
   end
 end

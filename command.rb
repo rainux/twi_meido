@@ -51,10 +51,23 @@ module TwiMeido
 [ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} via #{strip_tags(tweet.source)} ]
 [ Retweeted by @#{tweet.user.screen_name} ]
         TWEET
-      else
+
+      elsif tweet.user
         <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
 [ ID: #{tweet.id} via #{strip_tags(tweet.source)} ]
+        TWEET
+
+      elsif tweet.direct_message
+        dm = tweet.direct_message
+        <<-TWEET
+DM from #{dm.sender.screen_name} (#{dm.sender.name}):
+#{CGI.unescapeHTML(dm.text)}
+        TWEET
+
+      else
+        <<-TWEET
+#{tweet.inspect}
         TWEET
       end
     end
