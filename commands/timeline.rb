@@ -39,10 +39,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     define_command :mentions, /^-@$/ do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
-        <<-TWEET
-#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ ID: #{tweet.id} ]
-        TWEET
+        format_tweet(tweet)
       end
 
       tweets.reverse.join("\n")

@@ -72,18 +72,7 @@ MESSAGE
       end
 
       begin
-        if tweet.retweeted_status
-          say jid, <<-TWEET
-#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
-[ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} ]
-[ Retweeted by @#{tweet.user.screen_name} ]
-          TWEET
-        else
-          say jid, <<-TWEET
-#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ ID: #{tweet.id} ]
-          TWEET
-        end
+        say jid, format_tweet(tweet)
       rescue
         p $!
       end

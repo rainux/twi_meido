@@ -43,6 +43,21 @@ module TwiMeido
       end
       message
     end
+
+    def format_tweet(tweet)
+      if tweet.retweeted_status
+        <<-TWEET
+#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
+[ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} ]
+[ Retweeted by @#{tweet.user.screen_name} ]
+        TWEET
+      else
+        <<-TWEET
+#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
+[ ID: #{tweet.id} ]
+        TWEET
+      end
+    end
   end
 
   extend Command
