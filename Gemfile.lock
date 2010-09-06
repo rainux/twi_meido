@@ -47,6 +47,7 @@ GEM
       json (>= 1.1.9)
       mime-types (>= 1.16)
       oauth (>= 0.4.1)
+    yajl-ruby (0.7.7)
 
 PLATFORMS
   ruby
@@ -60,6 +61,6 @@ DEPENDENCIES
   dm-timestamps
   grackle
   hashie
-  json
   twitter-stream!
   twitter_oauth
+  yajl-ruby

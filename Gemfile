@@ -10,6 +10,6 @@ gem 'dm-migrations'
 gem 'dm-timestamps'
 gem 'activesupport'
 gem 'hashie'
-gem 'json'
+gem 'yajl-ruby', :require => 'yajl/json_gem'
 
 # vim: set ft=ruby:
