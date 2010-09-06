@@ -11,7 +11,7 @@ GEM
   specs:
     activesupport (3.0.0)
     addressable (2.2.0)
-    blather (0.4.10)
+    blather (0.4.14)
       eventmachine (>= 0.12.6)
       nokogiri (>= 1.4.0)
     data_objects (0.10.2)
