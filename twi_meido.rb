@@ -31,7 +31,7 @@ module TwiMeido
     client.run
   end
 
-  setup AppConfig.meido.email, AppConfig.meido.password
+  setup AppConfig.meido.email, AppConfig.meido.password, AppConfig.meido.host
 
   when_ready do
     puts "TwiMeido #{AppConfig.meido.email} ready."

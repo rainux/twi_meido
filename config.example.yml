@@ -1,6 +1,7 @@
 meido:
   email:
   password:
+  host: 'talk.google.com'
 
 twitter:
   consumer_key:
