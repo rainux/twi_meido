@@ -48,15 +48,19 @@ module TwiMeido
       if tweet.retweeted_status
         <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
-[ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} ]
+[ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} via #{strip_tags(tweet.source)} ]
 [ Retweeted by @#{tweet.user.screen_name} ]
         TWEET
       else
         <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ ID: #{tweet.id} ]
+[ ID: #{tweet.id} via #{strip_tags(tweet.source)} ]
         TWEET
       end
+    end
+
+    def strip_tags(text)
+      text.gsub /<[^>]+>/, ''
     end
   end
 
