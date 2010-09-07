@@ -1,24 +1,20 @@
-DataMapper.setup(:default, 'sqlite:twi_meido.db')
+MongoMapper.database = 'twi_meido'
 
 class User
-  include DataMapper::Resource
-  property :id,                     Serial
-  property :email,                  String,   :unique_index => true
-  property :twitter_user_id,        Integer
-  property :screen_name,            String
-  property :request_token,          String
-  property :request_token_secret,   String
-  property :oauth_token,            String
-  property :oauth_token_secret,     String
-  property :created_at,             DateTime
-  property :updated_at,             DateTime
-  property :notification,           Flag[:home, :mention, :dm], :default => [:mention, :dm]
+  include MongoMapper::Document
+  key :email,                   String, :index => true, :unique => true
+  key :twitter_user_id,         Integer
+  key :screen_name,             String
+  key :request_token,           String
+  key :request_token_secret,    String
+  key :oauth_token,             String
+  key :oauth_token_secret,      String
+  key :notification,            Array, :default => [:mention, :dm]
+  timestamps!
 
-  Notifications = notification.flag_map.values
+  Notifications = [:home, :mention, :dm]
 
   def authorized?
     !oauth_token.blank? && !oauth_token_secret.blank?
   end
 end
-
-DataMapper.auto_upgrade!

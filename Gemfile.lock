@@ -1,19 +1,4 @@
 GIT
-  remote: git://github.com/datamapper/dm-core.git
-  revision: c3eacc067d2aa90c5e147ae9e799ab37955d138a
-  specs:
-    dm-core (1.0.0)
-      addressable (~> 2.2)
-      extlib (~> 0.9.15)
-
-GIT
-  remote: git://github.com/datamapper/dm-migrations.git
-  revision: da2ef7d05624984e3cd1c22c7a9c4eef68373661
-  specs:
-    dm-migrations (1.0.0)
-      dm-core (~> 1.0.0)
-
-GIT
   remote: git://github.com/rainux/twitter-stream.git
   revision: ed8ca4284cc621b32e2a9075bd8cc51d61fac59b
   specs:
@@ -24,66 +9,51 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
-    activesupport (3.0.0)
-    addressable (2.2.0)
+    activesupport (2.3.9)
     awesome_print (0.2.1)
     blather (0.4.14)
       eventmachine (>= 0.12.6)
       nokogiri (>= 1.4.0)
-    data_objects (0.10.2)
-      addressable (~> 2.1)
-    dm-do-adapter (1.0.0)
-      data_objects (~> 0.10.1)
-      dm-core (~> 1.0.0)
-    dm-sqlite-adapter (1.0.0)
-      dm-do-adapter (~> 1.0.0)
-      do_sqlite3 (~> 0.10.2)
-    dm-timestamps (1.0.0)
-      dm-core (~> 1.0.0)
-    dm-types (1.0.0)
-      dm-core (~> 1.0.0)
-      fastercsv (~> 1.5.3)
-      json_pure (~> 1.4.3)
-      stringex (~> 1.1.0)
-      uuidtools (~> 2.1.1)
-    do_sqlite3 (0.10.2)
-      data_objects (= 0.10.2)
+    bson (1.0.7)
+    bson_ext (1.0.7)
     eventmachine (0.12.10)
-    extlib (0.9.15)
-    fastercsv (1.5.3)
     grackle (0.1.10)
       json
       mime-types
       oauth
     hashie (0.4.0)
+    jnunemaker-validatable (1.8.4)
+      activesupport (>= 2.3.4)
     json (1.4.6)
-    json_pure (1.4.6)
     mime-types (1.16)
+    mongo (1.0.8)
+      bson (>= 1.0.5)
+    mongo_mapper (0.8.4)
+      activesupport (>= 2.3.4)
+      jnunemaker-validatable (~> 1.8.4)
+      plucky (~> 0.3.5)
     nokogiri (1.4.3.1)
     oauth (0.4.3)
+    plucky (0.3.5)
+      mongo (~> 1.0.8)
     roauth (0.0.3)
-    stringex (1.1.0)
     twitter_oauth (0.4.3)
       json (>= 1.1.9)
       mime-types (>= 1.16)
       oauth (>= 0.4.1)
-    uuidtools (2.1.1)
     yajl-ruby (0.7.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport
+  activesupport (~> 2.3.8)
   awesome_print
   blather
-  dm-core!
-  dm-migrations!
-  dm-sqlite-adapter
-  dm-timestamps
-  dm-types
+  bson_ext
   grackle
   hashie
+  mongo_mapper
   twitter-stream!
   twitter_oauth
   yajl-ruby

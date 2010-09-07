@@ -10,7 +10,7 @@ module TwiMeido
       request_token = client.request_token(
         :oauth_callback => 'oob'
       )
-      user.update(
+      user.update_attributes(
         :request_token => request_token.token,
         :request_token_secret => request_token.secret
       )
@@ -35,7 +35,7 @@ After that you'll get a PIN code, use it with -bind command to complete the OAut
           :oauth_verifier => params[1]
         )
         account = Hashie::Mash.new(client.info)
-        user.update(
+        user.update_attributes(
           :twitter_user_id => account.id,
           :screen_name => account.screen_name,
           :oauth_token => access_token.token,
