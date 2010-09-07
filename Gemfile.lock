@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/rainux/hashie.git
+  revision: 853f79aaafa3ec901b18e7ee18318bde61073b4f
+  specs:
+    hashie (0.4.0)
+
+GIT
   remote: git://github.com/rainux/twitter-stream.git
   revision: ed8ca4284cc621b32e2a9075bd8cc51d61fac59b
   specs:
@@ -21,7 +27,6 @@ GEM
       json
       mime-types
       oauth
-    hashie (0.4.0)
     jnunemaker-validatable (1.8.4)
       activesupport (>= 2.3.4)
     json (1.4.6)
@@ -52,7 +57,7 @@ DEPENDENCIES
   blather
   bson_ext
   grackle
-  hashie
+  hashie!
   mongo_mapper
   twitter-stream!
   twitter_oauth
