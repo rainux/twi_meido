@@ -1,5 +1,5 @@
 meido:
-  email:
+  jabber_id:
   password:
   host: 'talk.google.com'
 

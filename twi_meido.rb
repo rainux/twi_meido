@@ -32,10 +32,10 @@ module TwiMeido
     client.run
   end
 
-  setup AppConfig.meido.email, AppConfig.meido.password, AppConfig.meido.host
+  setup AppConfig.meido.jabber_id, AppConfig.meido.password, AppConfig.meido.host
 
   when_ready do
-    puts "TwiMeido #{AppConfig.meido.email} ready."
+    puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
 
     client.roster.each do |jid, roster_item|
       discover :info, jid, nil
@@ -43,7 +43,7 @@ module TwiMeido
   end
 
   subscription :request? do |s|
-    User.first_or_create(:email => s.from.stripped.to_s)
+    User.first_or_create(:jabber_id => s.from.stripped.to_s)
     write_to_stream s.approve!
     say s.to, <<MESSAGE
 おかえりなさいませ、ご主人様！
@@ -53,7 +53,7 @@ MESSAGE
   end
 
   message :chat?, :body do |m|
-    user = User.first_or_create(:email => m.from.stripped.to_s)
+    user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
     TwitterClient.auth = {
       :type => :oauth,
       :consumer_key => AppConfig.twitter.consumer_key,
@@ -67,17 +67,17 @@ MESSAGE
   def self.process_user_stream(user, tweet)
     if tweet.entities
       if user.notification.include?(:home)
-        say user.email, format_tweet(tweet)
+        say user.jabber_id, format_tweet(tweet)
 
       elsif user.notification.include?(:mention) &&
         tweet.entities.user_mentions.collect(&:screen_name).include?(user.screen_name)
 
-        say user.email, format_tweet(tweet)
+        say user.jabber_id, format_tweet(tweet)
       end
 
     elsif tweet.direct_message && user.notification.include?(:dm) &&
       tweet.direct_message.sender.screen_name != user.screen_name
-      say user.email, format_tweet(tweet)
+      say user.jabber_id, format_tweet(tweet)
     end
   end
 end
