@@ -95,7 +95,7 @@ end
 EM.run do
   TwiMeido.run
 
-  UserStreams = User.all.collect do |user|
+  user_streams = User.all.collect do |user|
     next unless user.authorized?
 
     stream = Twitter::JSONStream.connect(
@@ -121,6 +121,8 @@ EM.run do
       end
     end
 
-    stream
+    [user.id, stream]
   end
+
+  UserStreams = Hash[user_streams]
 end

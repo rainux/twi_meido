@@ -98,5 +98,35 @@ Successfully bound your Twitter account, now you can:
         MESSAGE
       end
     end
+
+    define_command :track, /^-track\s*(.*)$/ do |user, message, params|
+      keywords = params[1].split(/\s+/)
+      user.tracking_keywords += keywords
+      user.tracking_keywords.uniq!
+      user.save
+
+      UserStreams[user.id].options[:filters] = user.tracking_keywords
+      UserStreams[user.id].immediate_reconnect
+
+      <<-MESSAGE
+ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
+Please make sure you've turned track on via command -on track.
+      MESSAGE
+    end
+
+    define_command :untrack, /^-untrack\s*(.*)$/ do |user, message, params|
+      keywords = params[1].split(/\s+/)
+      user.tracking_keywords -= keywords
+      user.tracking_keywords.uniq!
+      user.save
+
+      UserStreams[user.id].options[:filters] = user.tracking_keywords
+      UserStreams[user.id].immediate_reconnect
+
+      <<-MESSAGE
+ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
+Please make sure you've turned track on via command -on track.
+      MESSAGE
+    end
   end
 end
