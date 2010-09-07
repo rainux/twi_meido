@@ -2,6 +2,8 @@ MongoMapper.database = 'twi_meido'
 
 class User
   include MongoMapper::Document
+  plugin MongoMapper::Plugins::IdentityMap
+
   key :jabber_id,               String, :index => true
   key :request_token,           String
   key :request_token_secret,    String
