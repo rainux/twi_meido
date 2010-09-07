@@ -35,7 +35,7 @@ module TwiMeido
         begin
           response_body = Hashie::Mash.new(JSON.parse(error.response_body))
         rescue
-          return 'Big whale flying, ご主人様.'
+          return 'Big whale flying'
         end
         if response_body.errors
           message = response_body.errors.collect(&:message).join("\n")
