@@ -122,7 +122,8 @@ EM.run do
     end
 
     [user.id, stream]
-  end
+  end.compact
 
+  puts "#{user_streams.count} user streams connected."
   UserStreams = Hash[user_streams]
 end
