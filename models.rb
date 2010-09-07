@@ -8,13 +8,14 @@ class User
   key :oauth_token,             String
   key :oauth_token_secret,      String
   key :notification,            Array, :default => [:mention, :dm]
+  key :tracking_keywords,       Array
   timestamps!
 
   key :screen_name,             String
   key :twitter_user_id,         Integer
   key :twitter_user_created_at, DateTime
 
-  Notifications = [:home, :mention, :dm]
+  Notifications = [:home, :mention, :dm, :track]
 
   class << self
     def create_or_update_from_tweet(tweet)

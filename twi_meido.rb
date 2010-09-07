@@ -73,6 +73,16 @@ MESSAGE
         tweet.entities.user_mentions.collect(&:screen_name).include?(user.screen_name)
 
         say user.jabber_id, format_tweet(tweet)
+
+      elsif user.notification.include?(:track)
+        tweet_text = tweet.text.downcase
+        keywords = user.tracking_keywords.select do|keyword|
+          tweet_text.include?(keyword.downcase)
+        end
+
+        unless keywords.empty?
+          say user.jabber_id, format_tweet(tweet)
+        end
       end
 
     elsif tweet.direct_message && user.notification.include?(:dm) &&
@@ -92,6 +102,7 @@ EM.run do
       :host => 'betastream.twitter.com',
       :path => '/2b/user.json',
       :ssl => true,
+      :filters => user.tracking_keywords,
       :oauth => {
         :consumer_key => AppConfig.twitter.consumer_key,
         :consumer_secret => AppConfig.twitter.consumer_secret,
