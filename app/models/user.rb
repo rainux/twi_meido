@@ -36,12 +36,17 @@ class User
   end
 
   def push_viewed_tweet(tweet)
-    push :viewed_tweets => tweet
-    viewed_tweets.count
+    short_id = viewed_tweets.index {|t| t.id == tweet.id }
+    if short_id
+      short_id + 1
+    else
+      push :viewed_tweets => tweet
+      viewed_tweets.count
+    end
   end
 
-  def pick_viewed_tweet(index)
-    viewed_tweets[index - 1]
+  def pick_viewed_tweet(short_id)
+    viewed_tweets[short_id - 1]
   end
 
   def reset_short_id

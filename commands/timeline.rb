@@ -50,7 +50,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     define_command :mentions, /^-@$/ do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
-        format_tweet(tweet)
+        format_tweet(tweet, user.push_viewed_tweet(tweet))
       end
 
       tweets.reverse.join("\n")
