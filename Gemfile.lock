@@ -5,6 +5,15 @@ GIT
     hashie (0.4.0)
 
 GIT
+  remote: git://github.com/rainux/mongomapper.git
+  revision: 7d6f49bbe35e8d908f35f9d92704e549c365e8c2
+  specs:
+    mongo_mapper (0.8.4)
+      activesupport (>= 2.3.4)
+      jnunemaker-validatable (~> 1.8.4)
+      plucky (~> 0.3.5)
+
+GIT
   remote: git://github.com/rainux/twitter-stream.git
   revision: ed8ca4284cc621b32e2a9075bd8cc51d61fac59b
   specs:
@@ -33,10 +42,6 @@ GEM
     mime-types (1.16)
     mongo (1.0.8)
       bson (>= 1.0.5)
-    mongo_mapper (0.8.4)
-      activesupport (>= 2.3.4)
-      jnunemaker-validatable (~> 1.8.4)
-      plucky (~> 0.3.5)
     nokogiri (1.4.3.1)
     oauth (0.4.3)
     plucky (0.3.5)
@@ -58,7 +63,7 @@ DEPENDENCIES
   bson_ext
   grackle
   hashie!
-  mongo_mapper
+  mongo_mapper!
   twitter-stream!
   twitter_oauth
   yajl-ruby
