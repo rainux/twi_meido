@@ -42,9 +42,6 @@ After that you'll get a PIN code, use it with -bind command to complete the OAut
           :oauth_token_secret => access_token.secret
         )
 
-        TwitterStream.options[:filters] << user.screen_name
-        TwitterStream.immediate_reconnect
-
       rescue OAuth::Unauthorized
         return 'OAuth with Twitter failed, please retry by use -oauth command.'
       end
