@@ -1,5 +1,3 @@
-MongoMapper.database = 'twi_meido'
-
 class User
   include MongoMapper::Document
   plugin MongoMapper::Plugins::IdentityMap
