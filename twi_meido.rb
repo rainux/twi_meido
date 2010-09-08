@@ -6,6 +6,7 @@ require 'cgi'
 require 'yaml'
 
 require 'grackle_ext'
+require 'mash_ext'
 MongoMapper.database = 'twi_meido'
 require 'app/models/user'
 require 'command'
@@ -68,12 +69,12 @@ MESSAGE
   def self.process_user_stream(user, tweet)
     if tweet.entities
       if user.notification.include?(:home)
-        say user.jabber_id, format_tweet(tweet)
+        say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
 
       elsif user.notification.include?(:mention) &&
         tweet.entities.user_mentions.collect(&:screen_name).include?(user.screen_name)
 
-        say user.jabber_id, format_tweet(tweet)
+        say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
 
       elsif user.notification.include?(:track)
         tweet_text = tweet.text.downcase
@@ -82,7 +83,7 @@ MESSAGE
         end
 
         unless keywords.empty?
-          say user.jabber_id, format_tweet(tweet)
+          say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
         end
       end
 

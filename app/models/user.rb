@@ -9,6 +9,7 @@ class User
   key :oauth_token_secret,      String
   key :notification,            Array, :default => [:mention, :dm]
   key :tracking_keywords,       Array
+  key :viewed_tweets,           Array, :typecast => 'Hashie::Mash'
   timestamps!
 
   key :screen_name,             String
@@ -32,6 +33,15 @@ class User
       user = first_or_new(:twitter_user_id => twitter_user.id)
       user.update_attributes(twitter_user)
     end
+  end
+
+  def push_viewed_tweet(tweet)
+    push :viewed_tweets => tweet
+    viewed_tweets.count
+  end
+
+  def pick_viewed_tweet(index)
+    viewed_tweets[index - 1]
   end
 
   def authorized?

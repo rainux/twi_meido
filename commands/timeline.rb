@@ -3,13 +3,18 @@ module TwiMeido
     extend Command
 
     define_command :reply, /^-[@r]\s*(\d+)\s*(.*)$/ do |user, message, params|
-      id = params[1]
+      id = params[1].to_i
       status = params[2]
 
-      in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
+      if is_short_id(id)
+        in_reply_to_tweet = user.pick_viewed_tweet(id)
+      else
+        in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
+      end
+
       TwitterClient.statuses.update!(
         :status => "@#{in_reply_to_tweet.user.screen_name} #{status}",
-        :in_reply_to_status_id => id
+        :in_reply_to_status_id => in_reply_to_tweet.id
       )
 
       <<-MESSAGE
@@ -18,9 +23,15 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご
     end
 
     define_command :reply_all, /^-ra\s*(\d+)\s*(.*)$/ do |user, message, params|
-      id = params[1]
+      id = params[1].to_i
       status = params[2]
-      in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
+
+      if is_short_id(id)
+        in_reply_to_tweet = user.pick_viewed_tweet(id)
+      else
+        in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
+      end
+
       mentioned_users = in_reply_to_tweet.text.scan(%r{@[0-9A-Za-z_]+})
       mentioned_users = mentioned_users.uniq.reject do |user|
         ["@#{in_reply_to_tweet.user.screen_name.downcase}", '@rainux'].include?(user.downcase)
@@ -28,7 +39,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご
       mentioned_users.unshift "@#{in_reply_to_tweet.user.screen_name}"
       TwitterClient.statuses.update!(
         :status => "#{mentioned_users.join ' '} #{status}",
-        :in_reply_to_status_id => id
+        :in_reply_to_status_id => in_reply_to_tweet.id
       )
 
       <<-MESSAGE

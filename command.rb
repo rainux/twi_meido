@@ -48,18 +48,19 @@ module TwiMeido
       message
     end
 
-    def format_tweet(tweet)
+    def format_tweet(tweet, short_id = nil)
+
       if tweet.retweeted_status
         <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
-[ ID: #{tweet.id} ] [ #{tweet.retweeted_status.created_at} via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet.retweeted_status, short_id)} ] [ #{tweet.retweeted_status.created_at} via #{strip_tags(tweet.source)} ]
 [ Retweeted by @#{tweet.user.screen_name} ]
         TWEET
 
       elsif tweet.user
         <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ ID: #{tweet.id} via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet, short_id)} via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.direct_message
@@ -78,6 +79,18 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
 
     def strip_tags(text)
       text.gsub /<[^>]+>/, ''
+    end
+
+    def is_short_id(id)
+      id < 1000
+    end
+
+    def id_info(tweet, short_id)
+      if short_id
+        "Short ID: #{short_id} ID: #{tweet.id}"
+      else
+        "ID: #{tweet.id}"
+      end
     end
   end
 

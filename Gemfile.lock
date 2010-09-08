@@ -6,7 +6,7 @@ GIT
 
 GIT
   remote: git://github.com/rainux/mongomapper.git
-  revision: 7d6f49bbe35e8d908f35f9d92704e549c365e8c2
+  revision: c0c24f4fdfc137776919832fc032be406c086ccb
   specs:
     mongo_mapper (0.8.4)
       activesupport (>= 2.3.4)
