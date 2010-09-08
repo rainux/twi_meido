@@ -1,5 +1,7 @@
 module TwiMeido
   module Command
+    include ActionView::Helpers::DateHelper
+
     def define_command(name, pattern, &block)
       puts "Command registered: #{name}"
       @@commands ||= []
@@ -53,14 +55,14 @@ module TwiMeido
       if tweet.retweeted_status
         <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
-[ #{id_info(tweet.retweeted_status, short_id)} ] [ #{tweet.retweeted_status.created_at} via #{strip_tags(tweet.source)} ]
-[ Retweeted by @#{tweet.user.screen_name} ]
+[ #{id_info(tweet.retweeted_status, short_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
+[ Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user
         <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ #{id_info(tweet, short_id)} via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet, short_id)} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.direct_message
@@ -90,6 +92,12 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
         "Short ID: #{short_id} ID: #{tweet.id}"
       else
         "ID: #{tweet.id}"
+      end
+    end
+
+    def time_info(tweet)
+      if Time.parse(tweet.created_at) < 1.minute.ago
+        "#{time_ago_in_words(tweet.created_at)} ago "
       end
     end
   end
