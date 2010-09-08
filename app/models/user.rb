@@ -44,6 +44,12 @@ class User
     viewed_tweets[index - 1]
   end
 
+  def reset_short_id
+    viewed_tweets.count.times do
+      pop :viewed_tweets => -1
+    end
+  end
+
   def authorized?
     !oauth_token.blank? && !oauth_token_secret.blank?
   end

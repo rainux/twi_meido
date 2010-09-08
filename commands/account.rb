@@ -125,5 +125,10 @@ Please make sure you've turned track on via command -on track.
 Please make sure you've turned track on via command -on track.
       MESSAGE
     end
+
+    define_command :reset_short_id, /^-reset$/ do |user, message|
+      user.reset_short_id
+      'Short ID reset, ご主人様.'
+    end
   end
 end
