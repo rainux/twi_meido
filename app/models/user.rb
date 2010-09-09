@@ -31,7 +31,7 @@ class User
       return unless twitter_user
 
       user = first_or_new(:twitter_user_id => twitter_user.id)
-      user.update_attributes(twitter_user)
+      user.update_attributes(twitter_user) if user.new? || user.updated_at < 1.day.ago
     end
   end
 
@@ -41,7 +41,8 @@ class User
     if short_id
       short_id + 1
     else
-      push :viewed_tweets => tweet
+      viewed_tweets << tweet
+      save
       viewed_tweets.count
     end
   end
@@ -51,9 +52,8 @@ class User
   end
 
   def reset_short_id
-    viewed_tweets.count.times do
-      pop :viewed_tweets => -1
-    end
+    viewed_tweets = []
+    save
   end
 
   def authorized?

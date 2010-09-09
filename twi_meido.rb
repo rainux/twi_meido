@@ -73,9 +73,11 @@ MESSAGE
   def self.process_user_stream(tweet)
     if tweet.entities
       if current_user.notification.include?(:home)
+        User.create_or_update_from_tweet(tweet)
         say current_user.jabber_id, format_tweet(tweet)
 
       elsif current_user.notification.include?(:mention) &&
+        User.create_or_update_from_tweet(tweet)
         tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
 
         say current_user.jabber_id, format_tweet(tweet, current_user.view_tweet!(tweet))
@@ -120,8 +122,7 @@ EM.run do
     stream.each_item do |item|
       begin
         tweet = Hashie::Mash.new(JSON.parse(item))
-        User.create_or_update_from_tweet(tweet)
-        TwiMeido.current_user = user.reload
+        TwiMeido.current_user = user
         TwiMeido.process_user_stream(tweet)
       rescue
         puts "#{$!.inspect} #{__LINE__}"
