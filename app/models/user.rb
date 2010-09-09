@@ -35,7 +35,7 @@ class User
     end
   end
 
-  def push_viewed_tweet(tweet)
+  def view_tweet!(tweet)
     short_id = viewed_tweets.index {|t| t.id == tweet.id }
     if short_id
       short_id + 1
@@ -45,7 +45,7 @@ class User
     end
   end
 
-  def pick_viewed_tweet(short_id)
+  def viewed_tweet(short_id)
     viewed_tweets[short_id - 1]
   end
 

@@ -7,7 +7,7 @@ module TwiMeido
       status = params[2]
 
       if is_short_id(id)
-        in_reply_to_tweet = user.pick_viewed_tweet(id)
+        in_reply_to_tweet = user.viewed_tweet(id)
       else
         in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
       end
@@ -27,7 +27,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       status = params[2]
 
       if is_short_id(id)
-        in_reply_to_tweet = user.pick_viewed_tweet(id)
+        in_reply_to_tweet = user.viewed_tweet(id)
       else
         in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
       end
@@ -50,7 +50,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     define_command :mentions, /^-@$/ do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
-        format_tweet(tweet, user.push_viewed_tweet(tweet))
+        format_tweet(tweet, user.view_tweet!(tweet))
       end
 
       tweets.reverse.join("\n")
