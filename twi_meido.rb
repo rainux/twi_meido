@@ -30,6 +30,10 @@ TwitterClient.auth = {
 module TwiMeido
   extend Blather::DSL
 
+  class << self
+    attr_accessor :current_user
+  end
+
   def self.run
     client.run
   end
@@ -55,41 +59,41 @@ MESSAGE
   end
 
   message :chat?, :body do |m|
-    user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
+    @current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
     TwitterClient.auth = {
       :type => :oauth,
       :consumer_key => AppConfig.twitter.consumer_key,
       :consumer_secret => AppConfig.twitter.consumer_secret,
-      :token => user.oauth_token,
-      :token_secret => user.oauth_token_secret
+      :token => @current_user.oauth_token,
+      :token_secret => @current_user.oauth_token_secret
     }
-    say m.from, process_message(user, m)
+    say m.from, process_message(@current_user, m)
   end
 
-  def self.process_user_stream(user, tweet)
+  def self.process_user_stream(tweet)
     if tweet.entities
-      if user.notification.include?(:home)
-        say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
+      if current_user.notification.include?(:home)
+        say current_user.jabber_id, format_tweet(tweet, current_user.push_viewed_tweet(tweet))
 
-      elsif user.notification.include?(:mention) &&
-        tweet.entities.user_mentions.collect(&:screen_name).include?(user.screen_name)
+      elsif current_user.notification.include?(:mention) &&
+        tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
 
-        say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
+        say current_user.jabber_id, format_tweet(tweet, current_user.push_viewed_tweet(tweet))
 
-      elsif user.notification.include?(:track)
+      elsif current_user.notification.include?(:track)
         tweet_text = tweet.text.downcase
-        keywords = user.tracking_keywords.select do|keyword|
+        keywords = current_user.tracking_keywords.select do|keyword|
           tweet_text.include?(keyword.downcase)
         end
 
         unless keywords.empty?
-          say user.jabber_id, format_tweet(tweet, user.push_viewed_tweet(tweet))
+          say current_user.jabber_id, format_tweet(tweet, current_user.push_viewed_tweet(tweet))
         end
       end
 
-    elsif tweet.direct_message && user.notification.include?(:dm) &&
-      tweet.direct_message.sender.screen_name != user.screen_name
-      say user.jabber_id, format_tweet(tweet)
+    elsif tweet.direct_message && current_user.notification.include?(:dm) &&
+      tweet.direct_message.sender.screen_name != current_user.screen_name
+      say current_user.jabber_id, format_tweet(tweet)
     end
   end
 end
@@ -117,7 +121,8 @@ EM.run do
       begin
         tweet = Hashie::Mash.new(JSON.parse(item))
         User.create_or_update_from_tweet(tweet)
-        TwiMeido.process_user_stream(user.reload, tweet)
+        TwiMeido.current_user = user.reload
+        TwiMeido.process_user_stream(tweet)
       rescue
         puts "#{$!.inspect} #{__LINE__}"
       end
