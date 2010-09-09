@@ -73,7 +73,7 @@ MESSAGE
   def self.process_user_stream(tweet)
     if tweet.entities
       if current_user.notification.include?(:home)
-        say current_user.jabber_id, format_tweet(tweet, current_user.view_tweet!(tweet))
+        say current_user.jabber_id, format_tweet(tweet)
 
       elsif current_user.notification.include?(:mention) &&
         tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
@@ -87,7 +87,7 @@ MESSAGE
         end
 
         unless keywords.empty?
-          say current_user.jabber_id, format_tweet(tweet, current_user.view_tweet!(tweet))
+          say current_user.jabber_id, format_tweet(tweet)
         end
       end
 
