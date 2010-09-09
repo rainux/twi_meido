@@ -2,6 +2,53 @@ module TwiMeido
   module TimelineCommands
     extend Command
 
+    define_command :retweet, /^-re\s*(\d+)$/ do |user, message, params|
+      id = params[1].to_i
+
+      id = user.viewed_tweet(id).id if is_short_id(id)
+      TwitterClient.statuses.retweet!(:id => id)
+
+      <<-MESSAGE
+Successfully retweeted tweet #{id}, ご主人様.
+      MESSAGE
+    end
+
+    define_command :retweet_with_comment, /^-rt\s*(\d+)\s*(.*)$/ do |user, message, params|
+      id = params[1].to_i
+      comment = params[2]
+
+      if is_short_id(id)
+        tweet = user.viewed_tweet(id)
+      else
+        tweet = TwitterClient.statuses.show._(id).json?
+      end
+
+      text = "#{comment} RT @#{tweet.user.screen_name}: #{tweet.text}"
+      length = ActiveSupport::Multibyte::Chars.new(text).normalize(:c).length
+
+      case length
+      when 141
+        text = "#{comment}RT @#{tweet.user.screen_name}: #{tweet.text}"
+        length -= 1
+      when 142
+        text = "#{comment}RT @#{tweet.user.screen_name} #{tweet.text}"
+        length -= 2
+      end
+
+      if length > 140
+        <<-MESSAGE
+Your tweet has #{length} characters which has reached the 140 limitation, ご主人様.
+        MESSAGE
+
+      else
+        TwitterClient.statuses.update!(:status => text)
+
+        <<-MESSAGE
+Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your comment, ご主人様.
+        MESSAGE
+      end
+    end
+
     define_command :reply, /^-[@r]\s*(\d+)\s*(.*)$/ do |user, message, params|
       id = params[1].to_i
       status = params[2]
