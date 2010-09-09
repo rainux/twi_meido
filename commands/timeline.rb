@@ -18,7 +18,7 @@ module TwiMeido
       )
 
       <<-MESSAGE
-Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご主人様.
+Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply_to_tweet.id}, ご主人様.
       MESSAGE
     end
 
@@ -43,7 +43,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご
       )
 
       <<-MESSAGE
-Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_name}'s tweet #{id}, ご主人様.
+Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply_to_tweet.id}, ご主人様.
       MESSAGE
     end
 
