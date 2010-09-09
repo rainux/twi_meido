@@ -36,6 +36,7 @@ class User
   end
 
   def view_tweet!(tweet)
+    tweet = tweet.retweeted_status if tweet.retweeted_status
     short_id = viewed_tweets.index {|t| t.id == tweet.id }
     if short_id
       short_id + 1
