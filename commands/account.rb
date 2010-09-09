@@ -71,6 +71,7 @@ Successfully bound your Twitter account, now you can:
         <<-MESSAGE
 ご主人様, please use one of the following real-time notification types as parameter:
 #{User::Notifications.collect(&:to_s).join(' ')}
+Currently you've turned on #{user.notification.join(' ')}.
         MESSAGE
       end
     end
@@ -92,6 +93,7 @@ Successfully bound your Twitter account, now you can:
         <<-MESSAGE
 ご主人様, please use one of the following real-time notification types as parameter:
 #{User::Notifications.collect(&:to_s).join(' ')}
+Currently you've turned on #{user.notification.join(' ')}.
         MESSAGE
       end
     end
