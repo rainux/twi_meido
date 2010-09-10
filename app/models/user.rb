@@ -52,7 +52,7 @@ class User
   end
 
   def reset_short_id
-    viewed_tweets = []
+    self.viewed_tweets = []
     save
   end
 
