@@ -77,9 +77,9 @@ MESSAGE
         say current_user.jabber_id, format_tweet(tweet)
 
       elsif current_user.notification.include?(:mention) &&
-        User.create_or_update_from_tweet(tweet)
         tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
 
+        User.create_or_update_from_tweet(tweet)
         say current_user.jabber_id, format_tweet(tweet, current_user.view_tweet!(tweet))
 
       elsif current_user.notification.include?(:track)
