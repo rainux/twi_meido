@@ -81,7 +81,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
 
       mentioned_users = in_reply_to_tweet.text.scan(%r{@[0-9A-Za-z_]+})
       mentioned_users = mentioned_users.uniq.reject do |user|
-        ["@#{in_reply_to_tweet.user.screen_name.downcase}", '@rainux'].include?(user.downcase)
+        ["@#{in_reply_to_tweet.user.screen_name.downcase}", "@#{TwiMeido.current_user.screen_name.downcase}"].include?(user.downcase)
       end
       mentioned_users.unshift "@#{in_reply_to_tweet.user.screen_name}"
       TwitterClient.statuses.update!(
