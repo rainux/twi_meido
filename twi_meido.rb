@@ -30,6 +30,8 @@ TwitterClient.auth = {
 module TwiMeido
   extend Blather::DSL
 
+  VERSION = '0.1.0'
+
   class << self
     attr_accessor :current_user
   end
@@ -110,6 +112,7 @@ EM.run do
       :host => 'betastream.twitter.com',
       :path => '/2b/user.json',
       :ssl => true,
+      :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
       :filters => user.tracking_keywords,
       :oauth => {
         :consumer_key => AppConfig.twitter.consumer_key,
