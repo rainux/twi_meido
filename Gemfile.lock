@@ -1,12 +1,12 @@
 GIT
   remote: git://github.com/rainux/hashie.git
-  revision: 853f79aaafa3ec901b18e7ee18318bde61073b4f
+  revision: 853f79a
   specs:
     hashie (0.4.0)
 
 GIT
   remote: git://github.com/rainux/mongomapper.git
-  revision: c0c24f4fdfc137776919832fc032be406c086ccb
+  revision: 7d6f49b
   specs:
     mongo_mapper (0.8.4)
       activesupport (>= 2.3.4)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: git://github.com/rainux/twitter-stream.git
-  revision: ed8ca4284cc621b32e2a9075bd8cc51d61fac59b
+  revision: ed8ca42
   specs:
     twitter-stream (0.1.7)
       eventmachine (>= 0.12.8)
@@ -44,8 +44,8 @@ GEM
     blather (0.4.14)
       eventmachine (>= 0.12.6)
       nokogiri (>= 1.4.0)
-    bson (1.0.7)
-    bson_ext (1.0.7)
+    bson (1.0.9)
+    bson_ext (1.0.9)
     builder (2.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
@@ -59,7 +59,7 @@ GEM
       activesupport (>= 2.3.4)
     json (1.4.6)
     mime-types (1.16)
-    mongo (1.0.8)
+    mongo (1.0.9)
       bson (>= 1.0.5)
     nokogiri (1.4.3.1)
     oauth (0.4.3)
@@ -68,7 +68,7 @@ GEM
     rack (1.2.1)
     rack-mount (0.6.13)
       rack (>= 1.0.0)
-    rack-test (0.5.4)
+    rack-test (0.5.5)
       rack (>= 1.0)
     roauth (0.0.3)
     twitter_oauth (0.4.3)
