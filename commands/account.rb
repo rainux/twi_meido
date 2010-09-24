@@ -41,6 +41,7 @@ After that you'll get a PIN code, use it with -bind command to complete the OAut
           :oauth_token => access_token.token,
           :oauth_token_secret => access_token.secret
         )
+        user.reconnect_user_streams
 
       rescue OAuth::Unauthorized
         return 'OAuth with Twitter failed, please retry by use -oauth command.'
@@ -103,9 +104,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       user.tracking_keywords += keywords
       user.tracking_keywords.uniq!
       user.save
-
-      TwiMeido.user_streams[user.id].options[:filters] = user.tracking_keywords
-      TwiMeido.user_streams[user.id].immediate_reconnect
+      user.reconnect_user_streams
 
       <<-MESSAGE
 ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
@@ -118,9 +117,7 @@ Please make sure you've turned track on via command -on track.
       user.tracking_keywords -= keywords
       user.tracking_keywords.uniq!
       user.save
-
-      TwiMeido.user_streams[user.id].options[:filters] = user.tracking_keywords
-      TwiMeido.user_streams[user.id].immediate_reconnect
+      user.reconnect_user_streams
 
       <<-MESSAGE
 ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.

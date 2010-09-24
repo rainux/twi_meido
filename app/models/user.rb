@@ -101,6 +101,11 @@ class User
     TwiMeido.user_streams[id] = stream
   end
 
+  def reconnect_user_streams
+    TwiMeido.user_streams[id].stop if TwiMeido.user_streams[id]
+    connect_user_streams
+  end
+
   private
   def rename_twitter_user_attributes(attrs)
     attrs[:twitter_user_id] = attrs.delete(:id) if attrs.key? :id
