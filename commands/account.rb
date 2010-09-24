@@ -129,5 +129,10 @@ Please make sure you've turned track on via command -on track.
       user.reset_short_id
       'Short ID reset, ご主人様.'
     end
+
+    define_command :reconnect, /^-reconnect$/ do |user, message|
+      user.reconnect_user_streams
+      'User Streams reconnected, ご主人様.'
+    end
   end
 end
