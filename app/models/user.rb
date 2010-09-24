@@ -18,6 +18,8 @@ class User
 
   Notifications = [:home, :mention, :dm, :track]
 
+  scope :authorized, where(:oauth_token.ne => nil, :oauth_token_secret.ne => nil)
+
   class << self
     def create_or_update_from_tweet(tweet)
       twitter_user =
@@ -68,6 +70,35 @@ class User
   def update_attributes(attrs = {})
     rename_twitter_user_attributes(attrs)
     super
+  end
+
+  def connect_user_streams
+    stream = Twitter::JSONStream.connect(
+      :host => 'betastream.twitter.com',
+      :path => '/2b/user.json',
+      :ssl => true,
+      :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
+      :filters => tracking_keywords,
+        :oauth => {
+        :consumer_key => AppConfig.twitter.consumer_key,
+        :consumer_secret => AppConfig.twitter.consumer_secret,
+        :access_key      => oauth_token,
+        :access_secret   => oauth_token_secret
+      }
+    )
+
+    stream.each_item do |item|
+      begin
+        tweet = Hashie::Mash.new(JSON.parse(item))
+        TwiMeido.current_user = self
+        TwiMeido.process_user_stream(tweet)
+      rescue
+        puts "#{$!.inspect} #{__LINE__}"
+      end
+    end
+
+    puts "User streams for #{screen_name} connected"
+    TwiMeido.user_streams[id] = stream
   end
 
   private

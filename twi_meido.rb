@@ -105,38 +105,9 @@ MESSAGE
   end
 
   def self.connect_user_streams
-    user_streams = User.all.collect do |user|
-      next unless user.authorized?
-
-      stream = Twitter::JSONStream.connect(
-        :host => 'betastream.twitter.com',
-        :path => '/2b/user.json',
-        :ssl => true,
-        :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
-        :filters => user.tracking_keywords,
-        :oauth => {
-          :consumer_key => AppConfig.twitter.consumer_key,
-          :consumer_secret => AppConfig.twitter.consumer_secret,
-          :access_key      => user.oauth_token,
-          :access_secret   => user.oauth_token_secret
-        }
-      )
-
-      stream.each_item do |item|
-        begin
-          tweet = Hashie::Mash.new(JSON.parse(item))
-          TwiMeido.current_user = user
-          TwiMeido.process_user_stream(tweet)
-        rescue
-          puts "#{$!.inspect} #{__LINE__}"
-        end
-      end
-
-      [user.id, stream]
-    end.compact
-
+    @user_streams = {}
+    User.authorized.each(&:connect_user_streams)
     puts "#{user_streams.count} user streams connected."
-    @user_streams = Hash[user_streams]
   end
 end
 
