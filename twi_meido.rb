@@ -34,6 +34,7 @@ module TwiMeido
 
   class << self
     attr_accessor :current_user
+    attr_accessor :user_streams
   end
 
   def self.run
@@ -48,6 +49,8 @@ module TwiMeido
     client.roster.each do |jid, roster_item|
       discover :info, jid, nil
     end
+
+    connect_user_streams
   end
 
   subscription :request? do |s|
@@ -100,41 +103,43 @@ MESSAGE
       say current_user.jabber_id, format_tweet(tweet)
     end
   end
+
+  def self.connect_user_streams
+    user_streams = User.all.collect do |user|
+      next unless user.authorized?
+
+      stream = Twitter::JSONStream.connect(
+        :host => 'betastream.twitter.com',
+        :path => '/2b/user.json',
+        :ssl => true,
+        :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
+        :filters => user.tracking_keywords,
+        :oauth => {
+          :consumer_key => AppConfig.twitter.consumer_key,
+          :consumer_secret => AppConfig.twitter.consumer_secret,
+          :access_key      => user.oauth_token,
+          :access_secret   => user.oauth_token_secret
+        }
+      )
+
+      stream.each_item do |item|
+        begin
+          tweet = Hashie::Mash.new(JSON.parse(item))
+          TwiMeido.current_user = user
+          TwiMeido.process_user_stream(tweet)
+        rescue
+          puts "#{$!.inspect} #{__LINE__}"
+        end
+      end
+
+      [user.id, stream]
+    end.compact
+
+    puts "#{user_streams.count} user streams connected."
+    @user_streams = Hash[user_streams]
+  end
 end
 
 EM.run do
   TwiMeido.run
-
-  user_streams = User.all.collect do |user|
-    next unless user.authorized?
-
-    stream = Twitter::JSONStream.connect(
-      :host => 'betastream.twitter.com',
-      :path => '/2b/user.json',
-      :ssl => true,
-      :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
-      :filters => user.tracking_keywords,
-      :oauth => {
-        :consumer_key => AppConfig.twitter.consumer_key,
-        :consumer_secret => AppConfig.twitter.consumer_secret,
-        :access_key      => user.oauth_token,
-        :access_secret   => user.oauth_token_secret
-      }
-    )
-
-    stream.each_item do |item|
-      begin
-        tweet = Hashie::Mash.new(JSON.parse(item))
-        TwiMeido.current_user = user
-        TwiMeido.process_user_stream(tweet)
-      rescue
-        puts "#{$!.inspect} #{__LINE__}"
-      end
-    end
-
-    [user.id, stream]
-  end.compact
-
-  puts "#{user_streams.count} user streams connected."
-  UserStreams = Hash[user_streams]
 end

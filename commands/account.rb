@@ -104,8 +104,8 @@ Currently you've turned on #{user.notification.join(' ')}.
       user.tracking_keywords.uniq!
       user.save
 
-      UserStreams[user.id].options[:filters] = user.tracking_keywords
-      UserStreams[user.id].immediate_reconnect
+      TwiMeido.user_streams[user.id].options[:filters] = user.tracking_keywords
+      TwiMeido.user_streams[user.id].immediate_reconnect
 
       <<-MESSAGE
 ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
@@ -119,8 +119,8 @@ Please make sure you've turned track on via command -on track.
       user.tracking_keywords.uniq!
       user.save
 
-      UserStreams[user.id].options[:filters] = user.tracking_keywords
-      UserStreams[user.id].immediate_reconnect
+      TwiMeido.user_streams[user.id].options[:filters] = user.tracking_keywords
+      TwiMeido.user_streams[user.id].immediate_reconnect
 
       <<-MESSAGE
 ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
