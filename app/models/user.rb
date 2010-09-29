@@ -97,6 +97,14 @@ class User
       end
     end
 
+    stream.on_error do |message|
+      puts "User streams error:\n#{message}"
+    end
+
+    stream.on_max_reconnects do |timeout, retries|
+      puts "Max reconnects: timeout #{timeout}, #{retries} retries."
+    end
+
     puts "User streams for #{screen_name} connected"
     TwiMeido.user_streams[id] = stream
   end
