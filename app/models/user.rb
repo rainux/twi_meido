@@ -74,8 +74,8 @@ class User
 
   def connect_user_streams
     stream = Twitter::JSONStream.connect(
-      :host => 'betastream.twitter.com',
-      :path => '/2b/user.json',
+      :host => 'userstream.twitter.com',
+      :path => '/2/user.json',
       :ssl => true,
       :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
       :filters => tracking_keywords,
