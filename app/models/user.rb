@@ -7,7 +7,7 @@ class User
   key :request_token_secret,    String
   key :oauth_token,             String
   key :oauth_token_secret,      String
-  key :notification,            Array, :default => [:mention, :dm]
+  key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
   timestamps!
@@ -16,7 +16,7 @@ class User
   key :twitter_user_id,         Integer
   key :twitter_user_created_at, DateTime
 
-  Notifications = [:home, :mention, :dm, :track]
+  Notifications = [:home, :mention, :dm, :event, :track]
 
   scope :authorized, where(:oauth_token.ne => nil, :oauth_token_secret.ne => nil)
 

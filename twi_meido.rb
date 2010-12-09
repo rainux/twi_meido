@@ -99,6 +99,9 @@ MESSAGE
         end
       end
 
+    elsif (tweet.event || tweet[:delete]) && current_user.notification.include?(:event)
+      say current_user.jabber_id, format_event(tweet)
+
     elsif tweet.direct_message && current_user.notification.include?(:dm) &&
       tweet.direct_message.sender.screen_name != current_user.screen_name
       say current_user.jabber_id, format_tweet(tweet)
