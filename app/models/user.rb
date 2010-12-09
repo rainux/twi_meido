@@ -9,7 +9,7 @@ class User
   key :oauth_token_secret,      String
   key :notification,            Array, :default => [:mention, :dm]
   key :tracking_keywords,       Array
-  key :viewed_tweets,           Array, :typecast => 'Hashie::Mash'
+  key :viewed_tweet_ids,        Array
   timestamps!
 
   key :screen_name,             String
@@ -39,22 +39,23 @@ class User
 
   def view_tweet!(tweet)
     tweet = tweet.retweeted_status if tweet.retweeted_status
-    short_id = viewed_tweets.index {|t| t.id == tweet.id }
+    short_id = viewed_tweet_ids.index(tweet.id)
     if short_id
       short_id + 1
     else
-      viewed_tweets << tweet
+      viewed_tweet_ids << tweet.id
+      Tweet.create(tweet)
       save
-      viewed_tweets.count
+      viewed_tweet_ids.count
     end
   end
 
   def viewed_tweet(short_id)
-    viewed_tweets[short_id - 1]
+    Tweet.find(viewed_tweet_ids[short_id - 1])
   end
 
   def reset_short_id
-    self.viewed_tweets = []
+    self.viewed_tweet_ids = []
     save
   end
 
