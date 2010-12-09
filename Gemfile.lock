@@ -1,21 +1,21 @@
 GIT
   remote: git://github.com/rainux/hashie.git
-  revision: 853f79a
+  revision: 853f79aaafa3ec901b18e7ee18318bde61073b4f
   specs:
     hashie (0.4.0)
 
 GIT
   remote: git://github.com/rainux/mongomapper.git
-  revision: 7d6f49b
+  revision: dd3b68f10f87bcf3662956707ef508b318a6ccd2
   specs:
-    mongo_mapper (0.8.4)
+    mongo_mapper (0.8.6)
       activesupport (>= 2.3.4)
       jnunemaker-validatable (~> 1.8.4)
-      plucky (~> 0.3.5)
+      plucky (~> 0.3.6)
 
 GIT
   remote: git://github.com/rainux/twitter-stream.git
-  revision: ed8ca42
+  revision: ed8ca4284cc621b32e2a9075bd8cc51d61fac59b
   specs:
     twitter-stream (0.1.7)
       eventmachine (>= 0.12.8)
@@ -25,27 +25,27 @@ GEM
   remote: http://rubygems.org/
   specs:
     abstract (1.0.0)
-    actionpack (3.0.0)
-      activemodel (= 3.0.0)
-      activesupport (= 3.0.0)
+    actionpack (3.0.3)
+      activemodel (= 3.0.3)
+      activesupport (= 3.0.3)
       builder (~> 2.1.2)
       erubis (~> 2.6.6)
-      i18n (~> 0.4.1)
+      i18n (~> 0.4)
       rack (~> 1.2.1)
-      rack-mount (~> 0.6.12)
-      rack-test (~> 0.5.4)
+      rack-mount (~> 0.6.13)
+      rack-test (~> 0.5.6)
       tzinfo (~> 0.3.23)
-    activemodel (3.0.0)
-      activesupport (= 3.0.0)
+    activemodel (3.0.3)
+      activesupport (= 3.0.3)
       builder (~> 2.1.2)
-      i18n (~> 0.4.1)
-    activesupport (3.0.0)
-    awesome_print (0.2.1)
+      i18n (~> 0.4)
+    activesupport (3.0.3)
+    awesome_print (0.3.1)
     blather (0.4.14)
       eventmachine (>= 0.12.6)
       nokogiri (>= 1.4.0)
-    bson (1.0.9)
-    bson_ext (1.0.9)
+    bson (1.1.4)
+    bson_ext (1.1.4)
     builder (2.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
@@ -54,21 +54,21 @@ GEM
       json
       mime-types
       oauth
-    i18n (0.4.1)
+    i18n (0.5.0)
     jnunemaker-validatable (1.8.4)
       activesupport (>= 2.3.4)
     json (1.4.6)
     mime-types (1.16)
-    mongo (1.0.9)
-      bson (>= 1.0.5)
-    nokogiri (1.4.3.1)
-    oauth (0.4.3)
-    plucky (0.3.5)
-      mongo (~> 1.0.8)
+    mongo (1.1.4)
+      bson (>= 1.1.1)
+    nokogiri (1.4.4)
+    oauth (0.4.4)
+    plucky (0.3.6)
+      mongo (~> 1.1)
     rack (1.2.1)
     rack-mount (0.6.13)
       rack (>= 1.0.0)
-    rack-test (0.5.5)
+    rack-test (0.5.6)
       rack (>= 1.0)
     roauth (0.0.3)
     twitter_oauth (0.4.3)
@@ -76,7 +76,7 @@ GEM
       mime-types (>= 1.16)
       oauth (>= 0.4.1)
     tzinfo (0.3.23)
-    yajl-ruby (0.7.7)
+    yajl-ruby (0.7.8)
 
 PLATFORMS
   ruby
