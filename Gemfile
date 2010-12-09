@@ -12,4 +12,11 @@ gem 'hashie', :git => 'git://github.com/rainux/hashie.git'
 gem 'yajl-ruby', :require => 'yajl/json_gem'
 gem 'awesome_print', :require => 'ap'
 
+group :development do
+  gem 'awesome_print', :require => 'ap'
+  gem 'irbtools', :require => nil
+  gem 'irbtools-more', :require => nil
+  gem 'irb_rocket', :require => nil
+end
+
 # vim: set ft=ruby:
