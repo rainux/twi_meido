@@ -102,8 +102,9 @@ class User
         tweet = Hashie::Mash.new(JSON.parse(item))
         TwiMeido.current_user = self
         TwiMeido.process_user_stream(tweet)
-      rescue
-        puts "#{$!.inspect} #{__LINE__}"
+      rescue => error
+        puts error.inspect
+        puts error.backtrace.join("\n")
       end
     end
 
