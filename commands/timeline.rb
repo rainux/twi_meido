@@ -101,5 +101,36 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
 
       tweets.reverse.join("\n")
     end
+
+    define_command :profile, /^-me$/ do |user, message|
+      tweets = TwitterClient.statuses.user_timeline?(:screen_name => user.screen_name)
+      tweets.collect! do |tweet|
+        format_tweet(tweet, user.view_tweet!(tweet))
+      end
+
+      tweets.reverse.join("\n")
+    end
+
+    define_command :delete, /^-del\s*(\d+)?$/ do |user, message, params|
+      id = params[1].to_i
+
+      if id.zero?
+        tweets = TwitterClient.statuses.user_timeline?(:screen_name => user.screen_name, :count => 1)
+        id = tweets.first.id
+        message = <<-MESSAGE
+Successfully deleted your latest tweet.
+
+        MESSAGE
+      else
+        id = user.fetch_tweet(id).id
+        message = <<-MESSAGE
+Successfully deleted your tweet #{id}.
+
+        MESSAGE
+      end
+
+      tweet = TwitterClient.statuses.destroy!(:id => id)
+      message << format_tweet(tweet, user.view_tweet!(tweet))
+    end
   end
 end
