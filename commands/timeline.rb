@@ -5,7 +5,7 @@ module TwiMeido
     define_command :retweet, /^-re\s*(\d+)$/ do |user, message, params|
       id = params[1].to_i
 
-      id = user.viewed_tweet(id).id if is_short_id(id)
+      id = user.fetch_tweet(id).id if is_short_id(id)
       TwitterClient.statuses.retweet!(:id => id)
 
       <<-MESSAGE
@@ -17,11 +17,7 @@ Successfully retweeted tweet #{id}, ご主人様.
       id = params[1].to_i
       comment = params[2]
 
-      if is_short_id(id)
-        tweet = user.viewed_tweet(id)
-      else
-        tweet = TwitterClient.statuses.show._(id).json?
-      end
+      tweet = user.fetch_tweet(id)
 
       text = "#{comment} RT @#{tweet.user.screen_name}: #{tweet.text}"
       length = ActiveSupport::Multibyte::Chars.new(text).normalize(:c).length
@@ -53,11 +49,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
       id = params[1].to_i
       status = params[2]
 
-      if is_short_id(id)
-        in_reply_to_tweet = user.viewed_tweet(id)
-      else
-        in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
-      end
+      in_reply_to_tweet = user.fetch_tweet(id)
 
       TwitterClient.statuses.update!(
         :status => "@#{in_reply_to_tweet.user.screen_name} #{status}",
@@ -73,11 +65,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       id = params[1].to_i
       status = params[2]
 
-      if is_short_id(id)
-        in_reply_to_tweet = user.viewed_tweet(id)
-      else
-        in_reply_to_tweet = TwitterClient.statuses.show._(id).json?
-      end
+      in_reply_to_tweet = user.fetch_tweet(id)
 
       mentioned_users = in_reply_to_tweet.text.scan(%r{@[0-9A-Za-z_]+})
       mentioned_users = mentioned_users.uniq.reject do |user|

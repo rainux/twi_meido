@@ -60,6 +60,14 @@ class User
     save
   end
 
+  def fetch_tweet(short_id_or_tweet_id)
+    if short_id_or_tweet_id < 1000
+      viewed_tweet(short_id_or_tweet_id)
+    else
+      Tweet.fetch(short_id_or_tweet_id)
+    end
+  end
+
   def authorized?
     !oauth_token.blank? && !oauth_token_secret.blank?
   end
