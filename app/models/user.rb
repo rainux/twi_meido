@@ -43,6 +43,7 @@ class User
     if short_id
       short_id + 1
     else
+      viewed_tweet_ids.clear if viewed_tweet_ids.count >= 1000
       viewed_tweet_ids << tweet.id
       Tweet.create(tweet)
       save
