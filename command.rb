@@ -159,7 +159,7 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
 
     def id_info(tweet, short_id)
       if short_id
-        "Short ID: #{short_id} ID: #{tweet.id}"
+        "ID: #{short_id} << #{tweet.id}"
       else
         "ID: #{tweet.id}"
       end
