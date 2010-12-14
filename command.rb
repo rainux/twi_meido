@@ -41,7 +41,11 @@ module TwiMeido
           return 'Big whale flying'
         end
         if response_body.errors
-          message = response_body.errors.collect(&:message).join("\n")
+          if response_body.errors.kind_of?(Array)
+            message = response_body.errors.collect(&:message).join("\n")
+          else
+            message = response_body.errors
+          end
         elsif response_body.error
           message = response_body.error
         end
