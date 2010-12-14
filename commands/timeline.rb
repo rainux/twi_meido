@@ -102,8 +102,9 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :profile, /^-me$/ do |user, message|
-      tweets = TwitterClient.statuses.user_timeline?(:screen_name => user.screen_name)
+    define_command :profile, /^-(?:me|profile\s*(\S+)?)$/ do |user, message, params|
+      screen_name = params[1] ? params[1] : user.screen_name
+      tweets = TwitterClient.statuses.user_timeline?(:screen_name => screen_name)
       tweets.collect! do |tweet|
         format_tweet(tweet, user.view_tweet!(tweet))
       end
