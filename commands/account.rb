@@ -134,5 +134,56 @@ Please make sure you've turned track on via command -on track.
       user.reconnect_user_streams
       'User Streams reconnected, ご主人様.'
     end
+
+    define_command :follow, /^-fo\s*(\S+)$/ do |user, message, params|
+      screen_name = params[1]
+
+      begin
+        target_user = TwitterClient.friendships.create!(:screen_name => screen_name)
+        if !target_user.following && target.protected
+          message = "Since @#{screen_name} is protected, a follow request has been sent, ご主人様."
+        else
+          message = "You're now following @#{screen_name}, ご主人様."
+        end
+      rescue => error
+        if error.status == 403
+          message = "You've already followed @#{screen_name}, ご主人様."
+        else
+          raise error
+        end
+      end
+
+      message
+    end
+
+    define_command :unfollow, /^-unfo\s*(\S+)$/ do |user, message, params|
+      screen_name = params[1]
+
+      TwitterClient.friendships.destroy!(:screen_name => screen_name)
+
+      "You're no longer following @#{screen_name} now, ご主人様."
+    end
+
+    define_command :if_follow, /^-if\s*(\S+)$/ do |user, message, params|
+      screen_name = params[1]
+
+      result = TwitterClient.friendships.show?(
+        :source_screen_name => screen_name, :target_screen_name => user.screen_name
+      )
+
+      if result.relationship.source.following
+        message = "@#{screen_name} is following you, ご主人様.\n"
+      else
+        message = "@#{screen_name} isn't following you, ご主人様.\n"
+      end
+
+      if result.relationship.target.following
+        message << "You're following @#{screen_name}, ご主人様."
+      else
+        message << "You're not following @#{screen_name}, ご主人様."
+      end
+
+      message
+    end
   end
 end
