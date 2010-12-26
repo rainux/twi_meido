@@ -26,7 +26,14 @@ module TwiMeido
             end
 
           rescue => error
-            return "#{extract_error_message(error)}, ご主人様."
+            if error.kind_of?(Grackle::TwitterError) && error.status == 401
+              return <<-HELP
+* Start use me by send -oauth command to bind your Twitter account.
+* Send -help command for detailed help.
+              HELP
+            else
+              return "#{extract_error_message(error)}, ご主人様."
+            end
           end
         end
       end
