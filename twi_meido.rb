@@ -13,6 +13,7 @@ require 'app/models/tweet'
 require 'command'
 require 'commands/account'
 require 'commands/timeline'
+require 'commands/utility'
 require 'commands/not_implemented'
 require 'commands/tweet'
 
