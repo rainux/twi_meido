@@ -145,7 +145,7 @@ Please make sure you've turned track on via command -on track.
         else
           message = "You're now following @#{screen_name}, ご主人様."
         end
-      rescue => error
+      rescue Grackle::TwitterError => error
         if error.status == 403
           message = "You've already followed @#{screen_name}, ご主人様."
         else
