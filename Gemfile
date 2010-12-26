@@ -1,10 +1,10 @@
 source 'http://rubygems.org'
 
 gem 'blather', :require => 'blather/client'
-gem 'twitter-stream', :require => 'twitter/json_stream', :git => 'git://github.com/rainux/twitter-stream.git'
+gem 'twitter-stream', :require => 'twitter/json_stream'
 gem 'twitter_oauth'
 gem 'grackle'
-gem 'mongo_mapper', :git => 'git://github.com/rainux/mongomapper.git'
+gem 'mongo_mapper'
 gem 'bson_ext'
 gem 'activesupport'
 gem 'actionpack', :require => 'action_view'
