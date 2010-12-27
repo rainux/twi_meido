@@ -171,7 +171,7 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def id_info(tweet, shorten_id)
       if shorten_id
         short_id = TwiMeido.current_user.view_tweet!(tweet)
-        "ID: #{short_id} << #{tweet.id}"
+        "ID: #{short_id}"
       else
         "ID: #{tweet.id}"
       end
