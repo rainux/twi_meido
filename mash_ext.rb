@@ -1,7 +1,7 @@
 class Hashie::Mash
   class << self
     def to_mongo(value)
-      value.to_hash
+      value.to_hash if value
     end
 
     def from_mongo(value)
