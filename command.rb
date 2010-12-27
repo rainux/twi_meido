@@ -94,10 +94,15 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
     def format_event(event)
       case event.event
       when 'follow'
+        if event.source.screen_name == TwiMeido.current_user.screen_name
+          user = event.target
+        else
+          user = event.source
+        end
         <<-EVENT
 @#{event.source.screen_name} is now following @#{event.target.screen_name}.
 
-#{format_profile(event.source, false).chomp}
+#{format_profile(user, false).chomp}
         EVENT
 
       when 'favorite'
