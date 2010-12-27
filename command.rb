@@ -68,7 +68,7 @@ module TwiMeido
         <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
 [ #{id_info(tweet.retweeted_status, shorten_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
-[ Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet, shorten_id)} Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user
