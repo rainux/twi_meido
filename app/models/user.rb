@@ -38,13 +38,17 @@ class User
   end
 
   def view_tweet!(tweet)
-    short_id = viewed_tweet_ids.index(tweet.id)
+    Tweet.create(tweet) unless viewed_tweet_ids.include?(tweet.id)
+    view_tweet_id!(tweet.id)
+  end
+
+  def view_tweet_id!(tweet_id)
+    short_id = viewed_tweet_ids.index(tweet_id)
     if short_id
       short_id + 1
     else
       viewed_tweet_ids.clear if viewed_tweet_ids.count >= 1000
-      viewed_tweet_ids << tweet.id
-      Tweet.create(tweet)
+      viewed_tweet_ids << tweet_id
       save
       viewed_tweet_ids.count
     end
