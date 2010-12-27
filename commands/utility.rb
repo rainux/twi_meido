@@ -65,6 +65,7 @@ Retweet the specified tweet, this is the "official retweet".
 Retweet the specified tweet with your comment.
 
 -r tweet_id text
+-@ tweet_id text
 Reply the specified tweet with the text.
 
 -ra tweet_id text
