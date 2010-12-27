@@ -62,19 +62,19 @@ module TwiMeido
       message
     end
 
-    def format_tweet(tweet, short_id = nil)
+    def format_tweet(tweet, shorten_id = true)
 
       if tweet.retweeted_status
         <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
-[ #{id_info(tweet.retweeted_status, short_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
+[ #{id_info(tweet.retweeted_status, shorten_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
 [ Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user
         <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
-[ #{id_info(tweet, short_id)} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet, shorten_id)} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.direct_message
@@ -168,8 +168,9 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       id < 1000
     end
 
-    def id_info(tweet, short_id)
-      if short_id
+    def id_info(tweet, shorten_id)
+      if shorten_id
+        short_id = TwiMeido.current_user.view_tweet!(tweet)
         "ID: #{short_id} << #{tweet.id}"
       else
         "ID: #{tweet.id}"
