@@ -62,18 +62,37 @@ module TwiMeido
       message
     end
 
-    def format_tweet(tweet, shorten_id = true, show_in_reply_to = true)
+    def format_tweet(tweet, shorten_id = true, conversation_length = 1)
+      conversation = load_conversation(tweet, shorten_id, conversation_length)
+      if conversation
+        conversation = conversation.flatten.compact.join("\n")
+        conversation = "\n┌\n" << conversation.gsub(/^/m, '│ ') << '└'
+      end
+      formatted_tweet = format_single_tweet(tweet, shorten_id, conversation)
+    end
+
+    def load_conversation(tweet, shorten_id = true, conversation_length = 5)
+      if tweet.in_reply_to_status_id && conversation_length > 0
+        in_reply_to_tweet = Tweet.fetch(tweet.in_reply_to_status_id)
+        if in_reply_to_tweet
+          conversation = [format_single_tweet(in_reply_to_tweet, shorten_id)]
+          conversation << load_conversation(in_reply_to_tweet, shorten_id, conversation_length - 1)
+        end
+      end
+    end
+
+    def format_single_tweet(tweet, shorten_id = true, conversation = nil)
 
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
-#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}
+#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
 [ #{id_info(tweet.retweeted_status, shorten_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)}#{thread_info(tweet.retweeted_status)} ]
 [ #{id_info(tweet, shorten_id)} Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
-#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}
+#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
 [ #{id_info(tweet, shorten_id)} #{time_info(tweet)}via #{strip_tags(tweet.source)}#{thread_info(tweet)} ]
         TWEET
 
@@ -89,13 +108,6 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
 #{tweet.inspect}
         TWEET
       end
-
-      if tweet.in_reply_to_status_id && show_in_reply_to
-        in_reply_to_tweet = Tweet.fetch(tweet.in_reply_to_status_id)
-        formatted_tweet << format_tweet(in_reply_to_tweet, true, false) if in_reply_to_tweet
-      end
-
-      formatted_tweet
     end
 
     def format_event(event)
