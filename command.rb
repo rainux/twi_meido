@@ -66,7 +66,13 @@ module TwiMeido
       conversation = load_conversation(tweet, shorten_id, conversation_length)
       if conversation
         conversation = conversation.flatten.compact.join("\n")
-        conversation = "\n┌\n" << conversation.gsub(/^/m, '│ ') << '└'
+        conversation = <<-CONVERSATION
+
+┌────────────
+#{conversation.gsub(/^/m, '│ ').chomp}
+└────────────
+        CONVERSATION
+        conversation.chomp!
       end
       formatted_tweet = format_single_tweet(tweet, shorten_id, conversation)
     end
