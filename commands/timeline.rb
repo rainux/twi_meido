@@ -133,5 +133,13 @@ Successfully deleted your tweet #{id}.
       tweet = TwitterClient.statuses.destroy!(:id => id)
       message << format_tweet(tweet)
     end
+
+    define_command :show, /^-show\s*(\d+)(\s+\d+)?$/ do |user, message, params|
+      id = params[1].to_i
+      length = params[2].to_i
+      length = 5 if length.zero?
+
+      format_tweet(user.fetch_tweet(id), true, length)
+    end
   end
 end

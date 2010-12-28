@@ -87,6 +87,10 @@ Show the specified user's tweets.
 Delete the specified tweet of yours.
 Run without parameter will delete the latest tweet.
 
+-show tweet_id [conversation_length]
+Show the specified tweet, with conversation if available.
+Conversation length default to 5.
+
 -help
 Show this help.
         HELP
