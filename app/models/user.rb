@@ -38,7 +38,7 @@ class User
   end
 
   def view_tweet!(tweet)
-    Tweet.create(tweet) unless viewed_tweet_ids.include?(tweet.id)
+    Tweet.create(tweet) unless tweet.kind_of?(Tweet) || viewed_tweet_ids.include?(tweet.id)
     view_tweet_id!(tweet.id)
   end
 
