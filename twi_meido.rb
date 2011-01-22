@@ -5,6 +5,7 @@ require 'active_support/time_with_zone'
 require 'cgi'
 require 'yaml'
 
+require 'base26'
 require 'grackle_ext'
 require 'mash_ext'
 MongoMapper.database = 'twi_meido'

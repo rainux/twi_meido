@@ -2,8 +2,8 @@ module TwiMeido
   module TimelineCommands
     extend Command
 
-    define_command :retweet, /^-re\s*(\d+)$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :retweet, /^-re\s*(\d+|[a-z]+)$/i do |user, message, params|
+      id = params[1]
 
       id = user.fetch_tweet(id).id if is_short_id(id)
       TwitterClient.statuses.retweet!(:id => id)
@@ -13,8 +13,8 @@ Successfully retweeted tweet #{id}, ご主人様.
       MESSAGE
     end
 
-    define_command :retweet_with_comment, /^-rt\s*(\d+)\s*(.*)$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :retweet_with_comment, /^-rt\s*(\d+|[a-z]+)\s*(.*)$/i do |user, message, params|
+      id = params[1]
       comment = params[2]
 
       tweet = user.fetch_tweet(id)
@@ -45,8 +45,8 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
       end
     end
 
-    define_command :reply, /^-[@r]\s*(\d+)\s*(.*)$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :reply, /^-[@r]\s*(\d+|[a-z]+)\s*(.*)$/i do |user, message, params|
+      id = params[1]
       status = params[2]
 
       in_reply_to_tweet = user.fetch_tweet(id)
@@ -61,8 +61,8 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       MESSAGE
     end
 
-    define_command :reply_all, /^-ra\s*(\d+)\s*(.*)$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :reply_all, /^-ra\s*(\d+|[a-z]+)\s*(.*)$/i do |user, message, params|
+      id = params[1]
       status = params[2]
 
       in_reply_to_tweet = user.fetch_tweet(id)
@@ -112,10 +112,10 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :delete, /^-del\s*(\d+)?$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :delete, /^-del\s*(\d+|[a-z]+)?$/i do |user, message, params|
+      id = params[1]
 
-      if id.zero?
+      if id.nil?
         tweets = TwitterClient.statuses.user_timeline?(:screen_name => user.screen_name, :count => 1)
         id = tweets.first.id
         message = <<-MESSAGE
@@ -134,8 +134,8 @@ Successfully deleted your tweet #{id}.
       message << format_tweet(tweet)
     end
 
-    define_command :show, /^-show\s*(\d+)(\s+\d+)?$/ do |user, message, params|
-      id = params[1].to_i
+    define_command :show, /^-show\s*(\d+|[a-z]+)(\s+\d+)?$/i do |user, message, params|
+      id = params[1]
       length = params[2].to_i
       length = 5 if length.zero?
 

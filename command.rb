@@ -195,15 +195,20 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     end
 
     def is_short_id(id)
+      if id.respond_to?(:is_valid_b26?) && id.is_valid_b26?
+        id = id.as_b26_to_i
+      else
+        id = id.to_i
+      end
       id < 1000
     end
 
     def id_info(tweet, shorten_id)
       if shorten_id
         short_id = TwiMeido.current_user.view_tweet!(tweet)
-        "ID: #{short_id}"
+        "ID: ##{short_id.to_b26}"
       else
-        "ID: #{tweet.id}"
+        "ID: ##{tweet.id.to_b26}"
       end
     end
 
@@ -216,7 +221,7 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def thread_info(tweet)
       if tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name
         short_id = TwiMeido.current_user.view_tweet_id!(tweet.in_reply_to_status_id)
-        " in reply to tweet #{short_id}"
+        " in reply to tweet ##{short_id.to_b26}"
       end
     end
   end

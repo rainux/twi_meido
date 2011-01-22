@@ -64,6 +64,11 @@ class User
   end
 
   def fetch_tweet(short_id_or_tweet_id)
+    if short_id_or_tweet_id.respond_to?(:is_valid_b26?) && short_id_or_tweet_id.is_valid_b26?
+      short_id_or_tweet_id = short_id_or_tweet_id.as_b26_to_i
+    else
+      short_id_or_tweet_id = short_id_or_tweet_id.to_i
+    end
     if short_id_or_tweet_id < 1000
       viewed_tweet(short_id_or_tweet_id)
     else

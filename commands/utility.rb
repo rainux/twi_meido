@@ -45,9 +45,10 @@ Run without parameter to show currently tracking keywords.
 You can control real-time notification for tracked keywords by `-on track` and `-off track` command.
 
 -reset
-Reset short id to 1. Short id will be reset automatically when it reaches 1000.
-I will generate short id for any tweets you've viewed like this: [ ID: 85 << 19043509017247744 ... ].
-You can use short id with any commands that require a tweet id parameter.
+Reset short id to #A. Short id will be reset automatically when it reaches #BMM.
+I will generate short id for any tweets you've viewed like this: [ ID: #BZ ... ].
+The short id is a base-26 number which represent by letters A-Z.
+You can use short id with any commands that require a tweet id parameter (without the "#" character), it's case insensitive.
 
 -fo username
 Follow the specified user.
