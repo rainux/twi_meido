@@ -2,7 +2,7 @@ module TwiMeido
   module AccountCommands
     extend Command
 
-    define_command :oauth, /^-oauth$/ do |user, message|
+    define_command :oauth, /\A-oauth\Z/ do |user, message|
       client = TwitterOAuth::Client.new(
         :consumer_key => AppConfig.twitter.consumer_key,
         :consumer_secret => AppConfig.twitter.consumer_secret
@@ -23,7 +23,7 @@ After that you'll get a PIN code, use it with -bind command to complete the OAut
       MESSAGE
     end
 
-    define_command :bind, /^-bind\s*(.+)$/ do |user, message, params|
+    define_command :bind, /\A-bind\s*(.+)\Z/ do |user, message, params|
       begin
         client = TwitterOAuth::Client.new(
           :consumer_key => AppConfig.twitter.consumer_key,
@@ -55,7 +55,7 @@ Successfully bound your Twitter account, now you can:
       MESSAGE
     end
 
-    define_command :on, /^-on\s*(.*)$/ do |user, message, params|
+    define_command :on, /\A-on\s*(.*)\Z/ do |user, message, params|
       target = params[1].to_sym rescue nil
 
       if User::Notifications.include?(target)
@@ -77,7 +77,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :off, /^-off\s*(.*)$/ do |user, message, params|
+    define_command :off, /\A-off\s*(.*)\Z/ do |user, message, params|
       target = params[1].to_sym rescue nil
 
       if User::Notifications.include?(target)
@@ -99,7 +99,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :track, /^-track\s*(.*)$/ do |user, message, params|
+    define_command :track, /\A-track\s*(.*)\Z/ do |user, message, params|
       keywords = params[1].split(/\s+/)
       user.tracking_keywords += keywords
       user.tracking_keywords.uniq!
@@ -112,7 +112,7 @@ Please make sure you've turned track on via command -on track.
       MESSAGE
     end
 
-    define_command :untrack, /^-untrack\s*(.*)$/ do |user, message, params|
+    define_command :untrack, /\A-untrack\s*(.*)\Z/ do |user, message, params|
       keywords = params[1].split(/\s+/)
       user.tracking_keywords -= keywords
       user.tracking_keywords.uniq!
@@ -125,17 +125,17 @@ Please make sure you've turned track on via command -on track.
       MESSAGE
     end
 
-    define_command :reset_short_id, /^-reset$/ do |user, message|
+    define_command :reset_short_id, /\A-reset\Z/ do |user, message|
       user.reset_short_id
       'Short ID reset, ご主人様.'
     end
 
-    define_command :reconnect, /^-reconnect$/ do |user, message|
+    define_command :reconnect, /\A-reconnect\Z/ do |user, message|
       user.reconnect_user_streams
       'User Streams reconnected, ご主人様.'
     end
 
-    define_command :follow, /^-fo\s*(\S+)$/ do |user, message, params|
+    define_command :follow, /\A-fo\s*(\S+)\Z/ do |user, message, params|
       screen_name = params[1]
 
       begin
@@ -156,7 +156,7 @@ Please make sure you've turned track on via command -on track.
       message
     end
 
-    define_command :unfollow, /^-unfo\s*(\S+)$/ do |user, message, params|
+    define_command :unfollow, /\A-unfo\s*(\S+)\Z/ do |user, message, params|
       screen_name = params[1]
 
       TwitterClient.friendships.destroy!(:screen_name => screen_name)
@@ -164,7 +164,7 @@ Please make sure you've turned track on via command -on track.
       "You're no longer following @#{screen_name} now, ご主人様."
     end
 
-    define_command :if_follow, /^-if\s*(\S+)$/ do |user, message, params|
+    define_command :if_follow, /\A-if\s*(\S+)\Z/ do |user, message, params|
       screen_name = params[1]
 
       result = TwitterClient.friendships.show?(
