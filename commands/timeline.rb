@@ -13,7 +13,7 @@ Successfully retweeted tweet #{id}, ご主人様.
       MESSAGE
     end
 
-    define_command :retweet_with_comment, /\Art\s+(\d+|[a-z]+)(?:\s+(.*))?\Z/i do |user, message, params|
+    define_command :retweet_with_comment, /\Art\s+(\d+|[a-z]+)(?:\s+(.*))?\Z/im do |user, message, params|
       id = params[1]
       comment = params[2]
 
@@ -45,7 +45,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
       end
     end
 
-    define_command :reply, /\A[@r]\s+(\d+|[a-z]+)\s+(.*)\Z/i do |user, message, params|
+    define_command :reply, /\A[@r]\s+(\d+|[a-z]+)\s+(.*)\Z/im do |user, message, params|
       id = params[1]
       status = params[2]
 
@@ -61,7 +61,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       MESSAGE
     end
 
-    define_command :reply_all, /\Ara\s+(\d+|[a-z]+)\s+(.*)\Z/i do |user, message, params|
+    define_command :reply_all, /\Ara\s+(\d+|[a-z]+)\s+(.*)\Z/im do |user, message, params|
       id = params[1]
       status = params[2]
 
