@@ -2,7 +2,7 @@ module TwiMeido
   module TimelineCommands
     extend Command
 
-    define_command :retweet, /\Are\s*(\d+|[a-z]+)\Z/i do |user, message, params|
+    define_command :retweet, /\Are\s+(\d+|[a-z]+)\Z/i do |user, message, params|
       id = params[1]
 
       id = user.fetch_tweet(id).id if is_short_id(id)
@@ -13,7 +13,7 @@ Successfully retweeted tweet #{id}, ご主人様.
       MESSAGE
     end
 
-    define_command :retweet_with_comment, /\Art\s*(\d+|[a-z]+)\s*(.*)\Z/i do |user, message, params|
+    define_command :retweet_with_comment, /\Art\s+(\d+|[a-z]+)(?:\s+(.*))?\Z/i do |user, message, params|
       id = params[1]
       comment = params[2]
 
@@ -45,7 +45,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
       end
     end
 
-    define_command :reply, /\A[@r]\s*(\d+|[a-z]+)\s*(.*)\Z/i do |user, message, params|
+    define_command :reply, /\A[@r]\s+(\d+|[a-z]+)\s+(.*)\Z/i do |user, message, params|
       id = params[1]
       status = params[2]
 
@@ -61,7 +61,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       MESSAGE
     end
 
-    define_command :reply_all, /\Ara\s*(\d+|[a-z]+)\s*(.*)\Z/i do |user, message, params|
+    define_command :reply_all, /\Ara\s+(\d+|[a-z]+)\s+(.*)\Z/i do |user, message, params|
       id = params[1]
       status = params[2]
 
@@ -102,7 +102,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :profile, /\A(?:me|profile\s*(\S+)?)\Z/ do |user, message, params|
+    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/ do |user, message, params|
       screen_name = params[1] ? params[1] : user.screen_name
       tweets = TwitterClient.statuses.user_timeline?(:screen_name => screen_name)
       tweets.collect! do |tweet|
@@ -112,7 +112,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :delete, /\Adel\s*(\d+|[a-z]+)?\Z/i do |user, message, params|
+    define_command :delete, /\Adel(?:\s+(\d+|[a-z]+))?\Z/i do |user, message, params|
       id = params[1]
 
       if id.nil?
@@ -134,7 +134,7 @@ Successfully deleted your tweet #{id}.
       message << format_tweet(tweet)
     end
 
-    define_command :show, /\Ashow\s*(\d+|[a-z]+)(\s+\d+)?\Z/i do |user, message, params|
+    define_command :show, /\Ashow\s+(\d+|[a-z]+)(\s+\d+)?\Z/i do |user, message, params|
       id = params[1]
       length = params[2].to_i
       length = 5 if length.zero?
