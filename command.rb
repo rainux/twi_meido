@@ -3,39 +3,50 @@ module TwiMeido
     include ActionView::Helpers::DateHelper
     include ActionView::Helpers::NumberHelper
 
+    CommandLeaderRegex = /\A(?:\s+|\s*-)/
+
     def define_command(name, pattern, &block)
       puts "Command registered: #{name}"
       @@commands ||= []
-      @@commands << Hashie::Mash.new(
-        :name => name,
-        :pattern => pattern,
-        :action => block
-      )
+      if pattern
+        @@commands << Hashie::Mash.new(
+          :name => name,
+          :pattern => pattern,
+          :action => block
+        )
+      else
+        @@default_command = Hashie::Mash.new(
+          :name => name,
+          :action => block
+        )
+      end
     end
 
     def process_message(user, message)
-      @@commands ||= []
-      @@commands.each do |command|
-        match = message.body.strip.match(command.pattern)
-        if match
-          begin
+      message_body = message.body.rstrip
+      if message_body =~ CommandLeaderRegex
+        @@commands.each do |command|
+          match = message_body.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
+          if match
             if match.captures.empty?
               return command.action.call(user, message)
             else
               return command.action.call(user, message, match)
             end
-
-          rescue => error
-            if error.kind_of?(Grackle::TwitterError) && error.status == 401
-              return <<-HELP
-* Start use me by send -oauth command to bind your Twitter account.
-* Send -help command for detailed help.
-              HELP
-            else
-              return "#{extract_error_message(error)}, ご主人様."
-            end
           end
         end
+      else
+        return @@default_command.action.call(user, message)
+      end
+
+    rescue => error
+      if error.kind_of?(Grackle::TwitterError) && error.status == 401
+        return <<-HELP
+* Start use me by send -oauth command to bind your Twitter account.
+* Send -help command for detailed help.
+        HELP
+      else
+        return "#{extract_error_message(error)}, ご主人様."
       end
     end
 
