@@ -103,14 +103,14 @@ module TwiMeido
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
-[ #{id_info(tweet.retweeted_status, shorten_id)} #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)}#{thread_info(tweet.retweeted_status)} ]
-[ #{id_info(tweet, shorten_id)} Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)}#{thread_info(tweet.retweeted_status)} ]
+[ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
-[ #{id_info(tweet, shorten_id)} #{time_info(tweet)}via #{strip_tags(tweet.source)}#{thread_info(tweet)} ]
+[ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)}#{thread_info(tweet)} ]
         TWEET
 
       elsif tweet.direct_message
@@ -217,9 +217,9 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def id_info(tweet, shorten_id)
       if shorten_id
         short_id = TwiMeido.current_user.view_tweet!(tweet)
-        "ID: ##{short_id.to_b26}"
+        "##{short_id.to_b26} = ##{short_id}"
       else
-        "ID: ##{tweet.id.to_b26}"
+        "##{tweet.id.to_b26} = ##{tweet.id}"
       end
     end
 
@@ -232,7 +232,7 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def thread_info(tweet)
       if tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name
         short_id = TwiMeido.current_user.view_tweet_id!(tweet.in_reply_to_status_id)
-        " in reply to tweet ##{short_id.to_b26}"
+        " in reply to tweet ##{short_id.to_b26} = ##{short_id}"
       end
     end
   end
