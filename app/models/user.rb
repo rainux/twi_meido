@@ -45,17 +45,17 @@ class User
   def view_tweet_id!(tweet_id)
     short_id = viewed_tweet_ids.index(tweet_id)
     if short_id
-      short_id + 1
+      short_id
     else
       viewed_tweet_ids.clear if viewed_tweet_ids.count >= 1000
       viewed_tweet_ids << tweet_id
       save
-      viewed_tweet_ids.count
+      viewed_tweet_ids.count - 1
     end
   end
 
   def viewed_tweet(short_id)
-    Tweet.find(viewed_tweet_ids[short_id - 1])
+    Tweet.find(viewed_tweet_ids[short_id])
   end
 
   def reset_short_id
