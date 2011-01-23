@@ -72,6 +72,7 @@ Reply the specified tweet with the text.
  ra tweet_id text
 Reply the specified tweet with the text, and mention all users mentioned by the original tweet.
 
+ r
  @
 Show the tweets mentioned you.
 

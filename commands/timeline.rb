@@ -82,7 +82,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       MESSAGE
     end
 
-    define_command :mentions, /\A@\Z/ do |user, message|
+    define_command :mentions, /\A[@r]\Z/ do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
         format_tweet(tweet)
