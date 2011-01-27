@@ -103,14 +103,14 @@ module TwiMeido
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
-[ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)}#{thread_info(tweet.retweeted_status)} ]
+[ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
 [ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
-[ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)}#{thread_info(tweet)} ]
+[ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
       elsif tweet.direct_message
@@ -226,13 +226,6 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def time_info(tweet)
       if Time.parse(tweet.created_at) < 1.minute.ago
         "#{time_ago_in_words(tweet.created_at)} ago "
-      end
-    end
-
-    def thread_info(tweet)
-      if tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name
-        short_id = TwiMeido.current_user.view_tweet_id!(tweet.in_reply_to_status_id)
-        " in reply to tweet ##{short_id.to_b26} = ##{short_id}"
       end
     end
   end
