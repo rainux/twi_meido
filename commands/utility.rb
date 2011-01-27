@@ -2,7 +2,7 @@ module TwiMeido
   module UtilityCommand
     extend Command
 
-    define_command :help, /\Ah(elp)?(!)?\Z/ do |user, message, params|
+    define_command :help, /\Ah(elp)?(!)?\Z/i do |user, message, params|
       h_not_allowed = !params[1]
       dont_panic = params[2]
 

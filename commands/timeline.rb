@@ -82,7 +82,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       MESSAGE
     end
 
-    define_command :mentions, /\A[@r]\Z/ do |user, message|
+    define_command :mentions, /\A[@r]\Z/i do |user, message|
       tweets = TwitterClient.statuses.mentions?
       tweets.collect! do |tweet|
         format_tweet(tweet)
@@ -91,7 +91,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :direct_messages, /\Ad\Z/ do |user, message|
+    define_command :direct_messages, /\Ad\Z/i do |user, message|
       tweets = TwitterClient.direct_messages?
       tweets.collect! do |tweet|
         <<-DM
@@ -102,7 +102,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/ do |user, message, params|
+    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/i do |user, message, params|
       screen_name = params[1] ? params[1] : user.screen_name
       tweets = TwitterClient.statuses.user_timeline?(:screen_name => screen_name)
       tweets.collect! do |tweet|
