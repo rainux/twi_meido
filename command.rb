@@ -138,21 +138,21 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
         <<-EVENT
 @#{event.source.screen_name} is now following @#{event.target.screen_name}.
 
-#{format_profile(user, false).chomp}
+#{format_profile(user, false)}
         EVENT
 
       when 'favorite'
         <<-EVENT
 @#{event.source.screen_name} favorited @#{event.target.screen_name}'s tweet #{event.target_object.id}.
 
-#{format_tweet(event.target_object).chomp}
+#{format_tweet(event.target_object)}
         EVENT
 
       when 'unfavorite'
         <<-EVENT
 @#{event.source.screen_name} unfavorited @#{event.target.screen_name}'s tweet #{event.target_object.id}.
 
-#{format_tweet(event.target_object).chomp}
+#{format_tweet(event.target_object)}
         EVENT
 
       when 'block'

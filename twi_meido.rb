@@ -75,20 +75,25 @@ MESSAGE
       :token => @current_user.oauth_token,
       :token_secret => @current_user.oauth_token_secret
     }
-    say m.from, process_message(@current_user, m)
+    response = process_message(@current_user, m)
+    # The trailing space can prevent Google Talk chomp the blank line
+    response = response.rstrip + "\n "
+    say m.from, response
   end
 
   def self.process_user_stream(tweet)
+    notification = nil
+
     if tweet.entities
       if current_user.notification.include?(:home)
         User.create_or_update_from_tweet(tweet)
-        say current_user.jabber_id, format_tweet(tweet)
+        notification = format_tweet(tweet)
 
       elsif current_user.notification.include?(:mention) &&
         tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
 
         User.create_or_update_from_tweet(tweet)
-        say current_user.jabber_id, format_tweet(tweet)
+        notification = format_tweet(tweet)
 
       elsif current_user.notification.include?(:track)
         tweet_text = tweet.text.downcase
@@ -97,16 +102,22 @@ MESSAGE
         end
 
         unless keywords.empty?
-          say current_user.jabber_id, format_tweet(tweet)
+          notification = format_tweet(tweet)
         end
       end
 
     elsif (tweet.event || tweet[:delete]) && current_user.notification.include?(:event)
-      say current_user.jabber_id, format_event(tweet)
+      notification = format_event(tweet)
 
     elsif tweet.direct_message && current_user.notification.include?(:dm) &&
       tweet.direct_message.sender.screen_name != current_user.screen_name
-      say current_user.jabber_id, format_tweet(tweet)
+      notification = format_tweet(tweet)
+    end
+
+    if notification
+      # The trailing space can prevent Google Talk chomp the blank line
+      notification = notification.rstrip + "\n "
+      say current_user.jabber_id, notification
     end
   end
 
