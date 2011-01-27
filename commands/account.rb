@@ -164,23 +164,30 @@ Please make sure you've turned track on via command -on track.
       "You're no longer following @#{screen_name} now, ご主人様."
     end
 
-    define_command :if_follow, /\Aif\s+(\S+)\Z/i do |user, message, params|
-      screen_name = params[1]
+    define_command :if_follow, /\Aif\s+(\S+)(?:\s+(\S+))?\Z/i do |user, message, params|
+      source_screen_name = params[2] ? params[1] : user.screen_name
+      target_screen_name = params[2] ? params[2] : params[1]
 
       result = TwitterClient.friendships.show?(
-        :source_screen_name => screen_name, :target_screen_name => user.screen_name
+        :source_screen_name => source_screen_name, :target_screen_name => target_screen_name
       )
 
+      source = source_screen_name == user.screen_name ? "You're" : "@#{source_screen_name} is"
+      target = target_screen_name == user.screen_name ? 'you' : "@#{target_screen_name}"
+
       if result.relationship.source.following
-        message = "@#{screen_name} is following you, ご主人様.\n"
+        message = "#{source} following #{target}, ご主人様.\n"
       else
-        message = "@#{screen_name} isn't following you, ご主人様.\n"
+        message = "#{source} not following #{target}, ご主人様.\n"
       end
 
+      source = source_screen_name == user.screen_name ? 'you' : "@#{source_screen_name}"
+      target = target_screen_name == user.screen_name ? "You're" : "@#{target_screen_name} is"
+
       if result.relationship.target.following
-        message << "You're following @#{screen_name}, ご主人様."
+        message << "#{target} following #{source}, ご主人様."
       else
-        message << "You're not following @#{screen_name}, ご主人様."
+        message << "#{target} not following #{source}, ご主人様."
       end
 
       message

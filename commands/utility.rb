@@ -56,8 +56,8 @@ Follow the specified user.
  unfo username
 Unfollow the specified user.
 
- if username
-Show follow relationship between the specified user and you.
+ if username [another_username]
+Show follow relationship between you and the specified user, or between specified 2 users.
 
  re tweet_id
 Retweet the specified tweet, this is the "official retweet".
