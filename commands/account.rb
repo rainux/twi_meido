@@ -55,7 +55,7 @@ Successfully bound your Twitter account, now you can:
       MESSAGE
     end
 
-    define_command :on, /\Aon\s+(.*)\Z/ do |user, message, params|
+    define_command :on, /\Aon(?:\s+(.*))?\Z/ do |user, message, params|
       target = params[1].to_sym rescue nil
 
       if User::Notifications.include?(target)
@@ -77,7 +77,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :off, /\Aoff\s+(.*)\Z/ do |user, message, params|
+    define_command :off, /\Aoff(?:\s+(.*))?\Z/ do |user, message, params|
       target = params[1].to_sym rescue nil
 
       if User::Notifications.include?(target)
@@ -99,8 +99,8 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :track, /\Atrack\s+(.*)\Z/ do |user, message, params|
-      keywords = params[1].split(/\s+/)
+    define_command :track, /\Atrack(?:\s+(.*))?\Z/ do |user, message, params|
+      keywords = params[1].to_s.split(/\s+/)
       user.tracking_keywords += keywords
       user.tracking_keywords.uniq!
       user.save
@@ -112,7 +112,7 @@ Please make sure you've turned track on via command -on track.
       MESSAGE
     end
 
-    define_command :untrack, /\Auntrack\s+(.*)\Z/ do |user, message, params|
+    define_command :untrack, /\Auntrack(?:\s+(.*))?\Z/ do |user, message, params|
       keywords = params[1].split(/\s+/)
       user.tracking_keywords -= keywords
       user.tracking_keywords.uniq!
