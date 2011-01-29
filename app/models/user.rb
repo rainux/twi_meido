@@ -10,6 +10,7 @@ class User
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
+  key :last_short_id,           Integer, :default => -1
   timestamps!
 
   key :screen_name,             String
@@ -17,6 +18,7 @@ class User
   key :twitter_user_created_at, DateTime
 
   Notifications = [:home, :mention, :dm, :event, :track]
+  MaxShortId = 'ZZ'.as_b26_to_i
 
   scope :authorized, where(:oauth_token.ne => nil, :oauth_token_secret.ne => nil)
 
@@ -44,23 +46,17 @@ class User
 
   def view_tweet_id!(tweet_id)
     short_id = viewed_tweet_ids.index(tweet_id)
-    if short_id
-      short_id
-    else
-      viewed_tweet_ids.clear if viewed_tweet_ids.count >= 1000
-      viewed_tweet_ids << tweet_id
-      save
-      viewed_tweet_ids.count - 1
-    end
+    return short_id if short_id
+
+    self.last_short_id = -1 if self.last_short_id >= MaxShortId
+    self.last_short_id += 1
+    viewed_tweet_ids[self.last_short_id] = tweet_id
+    save
+    self.last_short_id
   end
 
   def viewed_tweet(short_id)
     Tweet.find(viewed_tweet_ids[short_id])
-  end
-
-  def reset_short_id
-    self.viewed_tweet_ids = []
-    save
   end
 
   def fetch_tweet(short_id_or_tweet_id)
