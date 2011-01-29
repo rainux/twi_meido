@@ -4,6 +4,14 @@ GIT
   specs:
     hashie (0.4.0)
 
+GIT
+  remote: git://github.com/rainux/twitter-stream.git
+  revision: bab4dc2dd10901808476e0fee4a4e3958a41603a
+  specs:
+    twitter-stream (0.1.10)
+      eventmachine (>= 0.12.8)
+      roauth (>= 0.0.2)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -101,9 +109,6 @@ GEM
     ruby-terminfo (0.1.1)
     sketches (0.1.1)
     spoon (0.0.1)
-    twitter-stream (0.1.10)
-      eventmachine (>= 0.12.8)
-      roauth (>= 0.0.2)
     twitter_oauth (0.4.3)
       json (>= 1.1.9)
       mime-types (>= 1.16)
@@ -128,6 +133,6 @@ DEPENDENCIES
   irbtools
   irbtools-more
   mongo_mapper
-  twitter-stream
+  twitter-stream!
   twitter_oauth
   yajl-ruby

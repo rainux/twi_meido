@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'blather', :require => 'blather/client'
-gem 'twitter-stream', :require => 'twitter/json_stream'
+gem 'twitter-stream', :require => 'twitter/json_stream', :git => 'git://github.com/rainux/twitter-stream.git'
 gem 'twitter_oauth'
 gem 'grackle'
 gem 'mongo_mapper'
