@@ -1,5 +1,6 @@
 class User
   include MongoMapper::Document
+  include TwiMeido::Command
   plugin MongoMapper::Plugins::IdentityMap
 
   key :jabber_id,               String, :index => true
@@ -11,6 +12,8 @@ class User
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
   key :last_short_id,           Integer, :default => -1
+  key :last_mention_id,         Integer
+  key :last_dm_id,              Integer
   timestamps!
 
   key :screen_name,             String
@@ -122,6 +125,7 @@ class User
 
     stream.on_unauthorized do
       remove_oauth_token
+      @rest_api_pulling_timer.cancel
     end
 
     stream.on_max_reconnects do |timeout, retries|
@@ -143,9 +147,78 @@ class User
     save
   end
 
+  def setup_rest_api_pulling
+    @rest_api_pulling_timer = EM.add_periodic_timer(60) do
+      pull_rest_api
+    end
+  end
+
+  def pull_rest_api
+    TwitterClient.auth = {
+      :type => :oauth,
+      :consumer_key => AppConfig.twitter.consumer_key,
+      :consumer_secret => AppConfig.twitter.consumer_secret,
+      :token => oauth_token,
+      :token_secret => oauth_token_secret
+    }
+    pull_mentions if notification.include?(:mention)
+    pull_dms if notification.include?(:dm)
+  end
+
   private
   def rename_twitter_user_attributes(attrs)
     attrs[:twitter_user_id] = attrs.delete(:id) if attrs.key? :id
     attrs[:twitter_user_created_at] = attrs.delete(:created_at) if attrs.key? :created_at
+  end
+
+  def pull_mentions
+    return unless last_mention_id
+
+    tweets = TwitterClient.statuses.mentions?(
+      :since_id => last_mention_id, :include_entities => true
+    )
+    return if tweets.empty?
+
+    new_last_mention_id = tweets.first.id
+
+    tweets.collect! do |tweet|
+      format_tweet(tweet)
+    end
+
+    message = tweets.reverse.join("\n")
+    message += <<-TEXT
+
+[ Provided by REST API ]
+    TEXT
+
+    TwiMeido.send_message(self, message)
+    update_attributes(:last_mention_id => new_last_mention_id)
+  end
+
+  def pull_dms
+    return unless last_dm_id
+
+    dms = TwitterClient.direct_messages?(
+      :since_id => last_dm_id, :include_entities => true
+    )
+    return if dms.empty?
+
+    new_last_dm_id = dms.first.id
+
+    dms.collect! do |dm|
+      <<-DM
+DM from #{dm.sender.screen_name} (#{dm.sender.name}):
+#{CGI.unescapeHTML(dm.text)}
+      DM
+    end
+
+    message = dms.reverse.join("\n")
+    message += <<-TEXT
+
+[ Provided by REST API ]
+    TEXT
+
+    TwiMeido.send_message(self, message)
+    update_attributes(:last_dm_id => new_last_dm_id)
   end
 end

@@ -9,9 +9,9 @@ require 'base26'
 require 'grackle_ext'
 require 'mash_ext'
 MongoMapper.database = 'twi_meido'
+require 'command'
 require 'app/models/user'
 require 'app/models/tweet'
-require 'command'
 require 'commands/account'
 require 'commands/timeline'
 require 'commands/utility'
@@ -92,6 +92,7 @@ MESSAGE
       elsif current_user.notification.include?(:mention) &&
         tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
 
+        current_user.update_attributes(:last_mention_id => tweet.id)
         User.create_or_update_from_tweet(tweet)
         notification = format_tweet(tweet)
 
@@ -111,6 +112,8 @@ MESSAGE
 
     elsif tweet.direct_message && current_user.notification.include?(:dm) &&
       tweet.direct_message.sender.screen_name != current_user.screen_name
+
+      current_user.update_attributes(:last_dm_id => tweet.direct_message.id)
       notification = format_tweet(tweet)
     end
 
@@ -121,9 +124,18 @@ MESSAGE
     end
   end
 
+  def self.send_message(user, message)
+    # The trailing space can prevent Google Talk chomp the blank line
+    message = message.rstrip + "\n "
+    say user.jabber_id, message
+  end
+
   def self.connect_user_streams
     @user_streams = {}
-    User.authorized.each(&:connect_user_streams)
+    User.authorized.each do |user|
+      user.connect_user_streams
+      user.setup_rest_api_pulling
+    end
     puts "#{user_streams.count} user streams connected."
   end
 end
