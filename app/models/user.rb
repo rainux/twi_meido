@@ -116,6 +116,14 @@ class User
       puts "User streams error:\n#{message}"
     end
 
+    stream.on_no_data do
+      reconnect_user_streams
+    end
+
+    stream.on_unauthorized do
+      remove_oauth_token
+    end
+
     stream.on_max_reconnects do |timeout, retries|
       puts "Max reconnects: timeout #{timeout}, #{retries} retries."
     end
@@ -127,6 +135,12 @@ class User
   def reconnect_user_streams
     TwiMeido.user_streams[id].stop if TwiMeido.user_streams[id]
     connect_user_streams
+  end
+
+  def remove_oauth_token
+    self.oauth_token = nil
+    self.oauth_token_secret = nil
+    save
   end
 
   private
