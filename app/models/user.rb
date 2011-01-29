@@ -92,7 +92,7 @@ class User
       :path => '/2/user.json',
       :ssl => true,
       :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
-      :filters => tracking_keywords,
+      # :filters => tracking_keywords,
       :oauth => {
         :consumer_key => AppConfig.twitter.consumer_key,
         :consumer_secret => AppConfig.twitter.consumer_secret,
