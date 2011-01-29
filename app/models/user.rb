@@ -5,8 +5,8 @@ class User
   key :jabber_id,               String, :index => true
   key :request_token,           String
   key :request_token_secret,    String
-  key :oauth_token,             String
-  key :oauth_token_secret,      String
+  key :oauth_token,             String, :index => true
+  key :oauth_token_secret,      String, :index => true
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
@@ -14,7 +14,7 @@ class User
   timestamps!
 
   key :screen_name,             String
-  key :twitter_user_id,         Integer
+  key :twitter_user_id,         Integer, :index => true
   key :twitter_user_created_at, DateTime
 
   Notifications = [:home, :mention, :dm, :event, :track]
