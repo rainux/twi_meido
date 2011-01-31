@@ -82,13 +82,7 @@ MESSAGE
   end
 
   def self.process_user_stream(item)
-    notification = if item.entities
-                     extract_unread_tweet(item)
-                   elsif (item.event || item[:delete])
-                     extract_event(item)
-                   elsif item.direct_message
-                     extract_unread_dm(item.direct_message)
-                   end
+    notification = extract_notification(item)
 
     if notification
       # The trailing space can prevent Google Talk chomp the blank line
@@ -97,17 +91,25 @@ MESSAGE
     end
   end
 
-  def self.send_message(user, message)
-    # The trailing space can prevent Google Talk chomp the blank line
-    message = message.rstrip + "\n "
-    say user.jabber_id, message
+  def self.process_rest_polling(items)
+    items = items.map do |item|
+      extract_notification(item)
+    end.compact.reverse
+
+    unless items.empty?
+      items << '[ Provided by REST API polling ]'
+      notification = items.join("\n")
+      # The trailing space can prevent Google Talk chomp the blank line
+      notification = notification + "\n "
+      say current_user.jabber_id, notification
+    end
   end
 
   def self.connect_user_streams
     @user_streams = {}
     User.authorized.each do |user|
       user.connect_user_streams
-      user.setup_rest_api_pulling
+      user.setup_rest_polling
     end
     puts "#{user_streams.count} user streams connected."
   end

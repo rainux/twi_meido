@@ -231,6 +231,16 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       end
     end
 
+    def extract_notification(item)
+      if item.entities
+        extract_unread_tweet(item)
+      elsif (item.event || item[:delete])
+        extract_event(item)
+      elsif item.direct_message
+        extract_unread_dm(item.direct_message)
+      end
+    end
+
     def extract_unread_tweet(tweet)
       if current_user.notification.include?(:home) ||
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
@@ -252,6 +262,11 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def extract_unread_dm(dm)
       if current_user.notification.include?(:dm) && dm.sender.screen_name != current_user.screen_name
         unless current_user.viewed_dm_ids.include?(dm.id)
+
+          unless current_user.last_dm_id
+            current_user.update_attributes(:last_dm_id => dm.id)
+          end
+
           format_dm(dm)
         end
       end
