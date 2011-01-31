@@ -83,11 +83,11 @@ MESSAGE
 
   def self.process_user_stream(item)
     notification = if item.entities
-                     extract_tweet(item)
+                     extract_unread_tweet(item)
                    elsif (item.event || item[:delete])
                      extract_event(item)
                    elsif item.direct_message
-                     extract_dm(item.direct_message)
+                     extract_unread_dm(item.direct_message)
                    end
 
     if notification

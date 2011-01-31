@@ -12,6 +12,8 @@ class User
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
   key :last_short_id,           Integer, :default => -1
+  key :viewed_dm_ids,           Array
+  key :last_dm_short_id,        Integer, :default => -1
   key :last_mention_id,         Integer
   key :last_dm_id,              Integer
   timestamps!
@@ -73,6 +75,17 @@ class User
     else
       Tweet.fetch(short_id_or_tweet_id)
     end
+  end
+
+  def view_dm!(dm)
+    short_id = viewed_dm_ids.index(dm.id)
+    return short_id if short_id
+
+    self.last_dm_short_id = -1 if self.last_dm_short_id >= MaxShortId
+    self.last_dm_short_id += 1
+    viewed_dm_ids[self.last_dm_short_id] = dm.id
+    save
+    self.last_dm_short_id
   end
 
   def authorized?

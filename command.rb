@@ -177,6 +177,8 @@ module TwiMeido
     end
 
     def format_dm(dm)
+      TwiMeido.current_user.view_dm!(dm)
+
       formatted_dm = <<-DM
 DM from #{dm.sender.screen_name} (#{dm.sender.name}):
 #{CGI.unescapeHTML(dm.text)}
@@ -229,14 +231,15 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       end
     end
 
-    def extract_tweet(tweet)
+    def extract_unread_tweet(tweet)
       if current_user.notification.include?(:home) ||
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
         (current_user.notification.include?(:track) && current_user.tracking?(tweet))
 
-        # current_user.update_attributes(:last_mention_id => tweet.id)
-        User.create_or_update_from_tweet(tweet)
-        format_tweet(tweet)
+        unless current_user.viewed_tweet_ids.include?(tweet.id)
+          User.create_or_update_from_tweet(tweet)
+          format_tweet(tweet)
+        end
       end
     end
 
@@ -246,10 +249,11 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       end
     end
 
-    def extract_dm(dm)
+    def extract_unread_dm(dm)
       if current_user.notification.include?(:dm) && dm.sender.screen_name != current_user.screen_name
-        # current_user.update_attributes(:last_dm_id => tweet.direct_message.id)
-        format_dm(dm)
+        unless current_user.viewed_dm_ids.include?(dm.id)
+          format_dm(dm)
+        end
       end
     end
   end
