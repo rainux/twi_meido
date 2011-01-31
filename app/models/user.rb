@@ -106,9 +106,12 @@ class User
 
     stream.each_item do |item|
       begin
-        tweet = Hashie::Mash.new(JSON.parse(item))
-        TwiMeido.current_user = self
-        TwiMeido.process_user_stream(tweet)
+        item = JSON.parse(item)
+        if item.respond_to?(:each_pair)
+          item = Hashie::Mash.new(item)
+          TwiMeido.current_user = self
+          TwiMeido.process_user_stream(item)
+        end
       rescue => error
         puts error.inspect
         puts error.backtrace.join("\n")
