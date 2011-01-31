@@ -113,13 +113,6 @@ module TwiMeido
 [ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
         TWEET
 
-      elsif tweet.direct_message
-        dm = tweet.direct_message
-        formatted_tweet = <<-TWEET
-DM from #{dm.sender.screen_name} (#{dm.sender.name}):
-#{CGI.unescapeHTML(dm.text)}
-        TWEET
-
       else
         formatted_tweet = <<-TWEET
 #{tweet.inspect}
@@ -183,6 +176,13 @@ DM from #{dm.sender.screen_name} (#{dm.sender.name}):
       end
     end
 
+    def format_dm(dm)
+      formatted_dm = <<-DM
+DM from #{dm.sender.screen_name} (#{dm.sender.name}):
+#{CGI.unescapeHTML(dm.text)}
+      DM
+    end
+
     def format_profile(user, with_stats = true)
       profile = <<-PROFILE
 #{user.name}
@@ -226,6 +226,30 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def time_info(tweet)
       if Time.parse(tweet.created_at) < 1.minute.ago
         "#{time_ago_in_words(tweet.created_at)} ago "
+      end
+    end
+
+    def extract_tweet(tweet)
+      if current_user.notification.include?(:home) ||
+        (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
+        (current_user.notification.include?(:track) && current_user.tracking?(tweet))
+
+        # current_user.update_attributes(:last_mention_id => tweet.id)
+        User.create_or_update_from_tweet(tweet)
+        format_tweet(tweet)
+      end
+    end
+
+    def extract_event(event)
+      if current_user.notification.include?(:event)
+        format_event(event)
+      end
+    end
+
+    def extract_dm(dm)
+      if current_user.notification.include?(:dm) && dm.sender.screen_name != current_user.screen_name
+        # current_user.update_attributes(:last_dm_id => tweet.direct_message.id)
+        format_dm(dm)
       end
     end
   end

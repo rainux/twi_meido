@@ -89,6 +89,18 @@ class User
     super
   end
 
+  def mentioned_by?(tweet)
+    tweet.entities.user_mentions.collect(&:id).include?(twitter_user_id)
+  end
+
+  def tracking?(tweet)
+    tweet_text = tweet.text.downcase
+    found = tracking_keywords.select do|keyword|
+      tweet_text.include?(keyword.downcase)
+    end
+    !found.empty?
+  end
+
   def connect_user_streams
     stream = Twitter::JSONStream.connect(
       :host => 'userstream.twitter.com',

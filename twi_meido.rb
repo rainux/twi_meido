@@ -81,41 +81,14 @@ MESSAGE
     say m.from, response
   end
 
-  def self.process_user_stream(tweet)
-    notification = nil
-
-    if tweet.entities
-      if current_user.notification.include?(:home)
-        User.create_or_update_from_tweet(tweet)
-        notification = format_tweet(tweet)
-
-      elsif current_user.notification.include?(:mention) &&
-        tweet.entities.user_mentions.collect(&:screen_name).include?(current_user.screen_name)
-
-        current_user.update_attributes(:last_mention_id => tweet.id)
-        User.create_or_update_from_tweet(tweet)
-        notification = format_tweet(tweet)
-
-      elsif current_user.notification.include?(:track)
-        tweet_text = tweet.text.downcase
-        keywords = current_user.tracking_keywords.select do|keyword|
-          tweet_text.include?(keyword.downcase)
-        end
-
-        unless keywords.empty?
-          notification = format_tweet(tweet)
-        end
-      end
-
-    elsif (tweet.event || tweet[:delete]) && current_user.notification.include?(:event)
-      notification = format_event(tweet)
-
-    elsif tweet.direct_message && current_user.notification.include?(:dm) &&
-      tweet.direct_message.sender.screen_name != current_user.screen_name
-
-      current_user.update_attributes(:last_dm_id => tweet.direct_message.id)
-      notification = format_tweet(tweet)
-    end
+  def self.process_user_stream(item)
+    notification = if item.entities
+                     extract_tweet(item)
+                   elsif (item.event || item[:delete])
+                     extract_event(item)
+                   elsif item.direct_message
+                     extract_dm(item.direct_message)
+                   end
 
     if notification
       # The trailing space can prevent Google Talk chomp the blank line
