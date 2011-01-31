@@ -76,19 +76,12 @@ MESSAGE
       :token_secret => @current_user.oauth_token_secret
     }
     response = process_message(@current_user, m)
-    # The trailing space can prevent Google Talk chomp the blank line
-    response = response.rstrip + "\n "
-    say m.from, response
+    send_message(m.from, response)
   end
 
   def self.process_user_stream(item)
     notification = extract_notification(item)
-
-    if notification
-      # The trailing space can prevent Google Talk chomp the blank line
-      notification = notification.rstrip + "\n "
-      say current_user.jabber_id, notification
-    end
+    send_message(current_user, notification) if notification
   end
 
   def self.process_rest_polling(items)
@@ -99,10 +92,15 @@ MESSAGE
     unless items.empty?
       items << '[ Provided by REST API polling ]'
       notification = items.join("\n")
-      # The trailing space can prevent Google Talk chomp the blank line
-      notification = notification + "\n "
-      say current_user.jabber_id, notification
+      send_message(current_user, notification)
     end
+  end
+
+  def self.send_message(user, message)
+    # The trailing space can prevent Google Talk chomp the blank line
+    message = message.rstrip + "\n "
+    jabber_id = user.respond_to?(:jabber_id) ? user.jabber_id : user
+    say jabber_id, message
   end
 
   def self.connect_user_streams
