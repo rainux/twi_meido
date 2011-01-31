@@ -66,12 +66,27 @@ Reply the specified tweet with the text.
  ra tweet_id text
 Reply the specified tweet with the text, and mention all users mentioned by the original tweet.
 
+ d username text
+Send text as DM to the specified user.
+
+ fav tweet_id
+Favorite the specified tweet.
+
+ unfav tweet_id
+Unfavorite the specified tweet.
+
+ home
+Show your home timeline tweets.
+
  r
  @
 Show the tweets mentioned you.
 
  d
 Show the direct messages sent to you.
+
+ fav
+Show the tweets you've favorited.
 
  me
 Show your tweets.

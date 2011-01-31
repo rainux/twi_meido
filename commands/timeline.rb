@@ -82,8 +82,39 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       MESSAGE
     end
 
+    define_command :direct_message, /\Ad\s+(\S+)\s+(\S+)\Z/i do |user, message, params|
+      screen_name = params[1]
+      text = params[2]
+
+      begin
+        dm = TwitterClient.direct_messages.new!(
+          :screen_name => screen_name, :text => text
+        )
+        response = "DM successfully sent to @#{screen_name}, ご主人様."
+
+      rescue Grackle::TwitterError => error
+        case error.status
+        when 403
+          response = "Can't sent dm to @#{screen_name} since he/she is not following you, ご主人様."
+        when 404
+          response = "The user @#{screen_name} is not exists, ご主人様."
+        end
+      end
+
+      response
+    end
+
+    define_command :home, /\Ahome\Z/i do |user, message|
+      tweets = TwitterClient.statuses.home_timeline? :include_entities => true
+      tweets.collect! do |tweet|
+        format_tweet(tweet)
+      end
+
+      tweets.reverse.join("\n")
+    end
+
     define_command :mentions, /\A[@r]\Z/i do |user, message|
-      tweets = TwitterClient.statuses.mentions?
+      tweets = TwitterClient.statuses.mentions? :include_entities => true
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -97,6 +128,15 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
         <<-DM
 #{tweet.sender.screen_name}: #{CGI.unescapeHTML(tweet.text)}
         DM
+      end
+
+      tweets.reverse.join("\n")
+    end
+
+    define_command :favorites, /\Afav\Z/i do |user, message|
+      tweets = TwitterClient.favorites? :include_entities => true
+      tweets.collect! do |tweet|
+        format_tweet(tweet)
       end
 
       tweets.reverse.join("\n")
@@ -140,6 +180,24 @@ Successfully deleted your tweet #{id}.
       length = 5 if length.zero?
 
       format_tweet(user.fetch_tweet(id), true, length)
+    end
+
+    define_command :favorite, /\Afav\s+(\d+|[a-z]+)\Z/i do |user, message, params|
+      id = params[1]
+
+      id = user.fetch_tweet(id).id if is_short_id(id)
+      TwitterClient.favorites.create!(:id => id)
+
+      "Successfully favorited tweet #{id}, ご主人様."
+    end
+
+    define_command :unfavorite, /\Aunfav\s+(\d+|[a-z]+)\Z/i do |user, message, params|
+      id = params[1]
+
+      id = user.fetch_tweet(id).id if is_short_id(id)
+      TwitterClient.favorites.destroy!(:id => id)
+
+      "Successfully unfavorited tweet #{id}, ご主人様."
     end
   end
 end
