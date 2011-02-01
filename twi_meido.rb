@@ -5,18 +5,23 @@ require 'active_support/time_with_zone'
 require 'cgi'
 require 'yaml'
 
-require 'base26'
-require 'grackle_ext'
-require 'mash_ext'
 MongoMapper.database = 'twi_meido'
-require 'command'
-require 'app/models/user'
-require 'app/models/tweet'
-require 'commands/account'
-require 'commands/timeline'
-require 'commands/utility'
-require 'commands/not_implemented'
-require 'commands/tweet'
+
+unless defined?(require_relative)
+  alias require_relative require
+end
+
+require_relative 'base26'
+require_relative 'grackle_ext'
+require_relative 'mash_ext'
+require_relative 'command'
+require_relative 'app/models/user'
+require_relative 'app/models/tweet'
+require_relative 'commands/account'
+require_relative 'commands/timeline'
+require_relative 'commands/utility'
+require_relative 'commands/not_implemented'
+require_relative 'commands/tweet'
 
 AppConfig = Hashie::Mash.new(YAML.load_file('config.yml'))
 
