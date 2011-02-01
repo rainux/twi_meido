@@ -136,7 +136,7 @@ Please make sure you've turned track on via command -on track.
       screen_name = params[1]
 
       begin
-        target_user = user.rest_api_client.friendships.create!(:screen_name => screen_name)
+        target_user = TwiMeido.current_user.rest_api_client.friendships.create!(:screen_name => screen_name)
         if !target_user.following && target.protected
           message = "Since @#{screen_name} is protected, a follow request has been sent, ご主人様."
         else
@@ -156,7 +156,7 @@ Please make sure you've turned track on via command -on track.
     define_command :unfollow, /\Aunfo\s+(\S+)\Z/i do |user, message, params|
       screen_name = params[1]
 
-      user.rest_api_client.friendships.destroy!(:screen_name => screen_name)
+      TwiMeido.current_user.rest_api_client.friendships.destroy!(:screen_name => screen_name)
 
       "You're no longer following @#{screen_name} now, ご主人様."
     end
@@ -165,7 +165,7 @@ Please make sure you've turned track on via command -on track.
       source_screen_name = params[2] ? params[1] : user.screen_name
       target_screen_name = params[2] ? params[2] : params[1]
 
-      result = user.rest_api_client.friendships.show?(
+      result = TwiMeido.current_user.rest_api_client.friendships.show?(
         :source_screen_name => source_screen_name, :target_screen_name => target_screen_name
       )
 
