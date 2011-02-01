@@ -44,6 +44,21 @@ class User
     end
   end
 
+  def rest_api_client
+    @rest_api_client ||= Grackle::Client.new(
+      :handlers => { :json => Grackle::Handlers::JSON2MashHandler.new }
+    ).tap do |client|
+
+      client.auth = {
+        :type => :oauth,
+        :consumer_key => AppConfig.twitter.consumer_key,
+        :consumer_secret => AppConfig.twitter.consumer_secret,
+        :token => oauth_token,
+        :token_secret => oauth_token_secret
+      }
+    end
+  end
+
   def view_tweet!(tweet)
     Tweet.create(tweet) unless tweet.kind_of?(Tweet) || viewed_tweet_ids.include?(tweet.id)
     view_tweet_id!(tweet.id)
@@ -181,13 +196,6 @@ class User
 
   def setup_rest_polling
     @rest_polling_timer = EM.add_periodic_timer(90) do
-      TwitterClient.auth = {
-        :type => :oauth,
-        :consumer_key => AppConfig.twitter.consumer_key,
-        :consumer_secret => AppConfig.twitter.consumer_secret,
-        :token => oauth_token,
-        :token_secret => oauth_token_secret
-      }
       TwiMeido.current_user = self
 
       pull_mentions if notification.include?(:mention)
@@ -204,7 +212,7 @@ class User
   def pull_mentions
     return unless last_mention_id
 
-    tweets = TwitterClient.statuses.mentions?(
+    tweets = rest_api_client.statuses.mentions?(
       :since_id => last_mention_id, :count => 200, :include_entities => true
     )
     return if tweets.empty?
@@ -217,7 +225,7 @@ class User
   def pull_dms
     return unless last_dm_id
 
-    dms = TwitterClient.direct_messages?(
+    dms = rest_api_client.direct_messages?(
       :since_id => last_dm_id, :count => 200, :include_entities => true
     )
     return if dms.empty?

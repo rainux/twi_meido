@@ -9,7 +9,7 @@ class Tweet
   class << self
     def fetch(id)
       Tweet.find(id) || Tweet.create(
-        TwitterClient.statuses.show._(id).json?
+        TwiMeido.current_user.rest_api_client.statuses.show._(id).json?
       )
     rescue
     end

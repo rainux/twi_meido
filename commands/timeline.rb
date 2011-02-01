@@ -6,7 +6,7 @@ module TwiMeido
       id = params[1]
 
       id = user.fetch_tweet(id).id if is_short_id(id)
-      TwitterClient.statuses.retweet!(:id => id)
+      user.rest_api_client.statuses.retweet!(:id => id)
 
       <<-MESSAGE
 Successfully retweeted tweet #{id}, ご主人様.
@@ -37,7 +37,7 @@ Your tweet has #{length} characters which has reached the 140 limitation, ご主
         MESSAGE
 
       else
-        TwitterClient.statuses.update!(:status => text)
+        user.rest_api_client.statuses.update!(:status => text)
 
         <<-MESSAGE
 Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your comment, ご主人様.
@@ -51,7 +51,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
 
       in_reply_to_tweet = user.fetch_tweet(id)
 
-      TwitterClient.statuses.update!(
+      user.rest_api_client.statuses.update!(
         :status => "@#{in_reply_to_tweet.user.screen_name} #{status}",
         :in_reply_to_status_id => in_reply_to_tweet.id
       )
@@ -72,7 +72,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
         ["@#{in_reply_to_tweet.user.screen_name.downcase}", "@#{TwiMeido.current_user.screen_name.downcase}"].include?(user.downcase)
       end
       mentioned_users.unshift "@#{in_reply_to_tweet.user.screen_name}"
-      TwitterClient.statuses.update!(
+      user.rest_api_client.statuses.update!(
         :status => "#{mentioned_users.join ' '} #{status}",
         :in_reply_to_status_id => in_reply_to_tweet.id
       )
@@ -87,7 +87,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       text = params[2]
 
       begin
-        dm = TwitterClient.direct_messages.new!(
+        dm = user.rest_api_client.direct_messages.new!(
           :screen_name => screen_name, :text => text
         )
         response = "DM successfully sent to @#{screen_name}, ご主人様."
@@ -105,7 +105,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     end
 
     define_command :home, /\Ahome\Z/i do |user, message|
-      tweets = TwitterClient.statuses.home_timeline? :include_entities => true
+      tweets = user.rest_api_client.statuses.home_timeline? :include_entities => true
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -114,7 +114,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     end
 
     define_command :mentions, /\A[@r]\Z/i do |user, message|
-      tweets = TwitterClient.statuses.mentions? :include_entities => true
+      tweets = user.rest_api_client.statuses.mentions? :include_entities => true
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -123,7 +123,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     end
 
     define_command :direct_messages, /\Ad\Z/i do |user, message|
-      tweets = TwitterClient.direct_messages?
+      tweets = user.rest_api_client.direct_messages?
       tweets.collect! do |tweet|
         <<-DM
 #{tweet.sender.screen_name}: #{CGI.unescapeHTML(tweet.text)}
@@ -134,7 +134,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     end
 
     define_command :favorites, /\Afav\Z/i do |user, message|
-      tweets = TwitterClient.favorites? :include_entities => true
+      tweets = user.rest_api_client.favorites? :include_entities => true
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -144,7 +144,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
 
     define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/i do |user, message, params|
       screen_name = params[1] ? params[1] : user.screen_name
-      tweets = TwitterClient.statuses.user_timeline?(:screen_name => screen_name)
+      tweets = user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name)
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -156,7 +156,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       id = params[1]
 
       if id.nil?
-        tweets = TwitterClient.statuses.user_timeline?(:screen_name => user.screen_name, :count => 1)
+        tweets = user.rest_api_client.statuses.user_timeline?(:screen_name => user.screen_name, :count => 1)
         id = tweets.first.id
         message = <<-MESSAGE
 Successfully deleted your latest tweet.
@@ -170,7 +170,7 @@ Successfully deleted your tweet #{id}.
         MESSAGE
       end
 
-      tweet = TwitterClient.statuses.destroy!(:id => id)
+      tweet = user.rest_api_client.statuses.destroy!(:id => id)
       message << format_tweet(tweet)
     end
 
@@ -186,7 +186,7 @@ Successfully deleted your tweet #{id}.
       id = params[1]
 
       id = user.fetch_tweet(id).id if is_short_id(id)
-      TwitterClient.favorites.create!(:id => id)
+      user.rest_api_client.favorites.create!(:id => id)
 
       "Successfully favorited tweet #{id}, ご主人様."
     end
@@ -195,7 +195,7 @@ Successfully deleted your tweet #{id}.
       id = params[1]
 
       id = user.fetch_tweet(id).id if is_short_id(id)
-      TwitterClient.favorites.destroy!(:id => id)
+      user.rest_api_client.favorites.destroy!(:id => id)
 
       "Successfully unfavorited tweet #{id}, ご主人様."
     end

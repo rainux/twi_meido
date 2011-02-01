@@ -25,16 +25,6 @@ require_relative 'commands/tweet'
 
 AppConfig = Hashie::Mash.new(YAML.load_file('config.yml'))
 
-TwitterClient = Grackle::Client.new(
-  :handlers => {:json => Grackle::Handlers::JSON2MashHandler.new }
-)
-
-TwitterClient.auth = {
-  :type => :oauth,
-  :consumer_key => AppConfig.twitter.consumer_key,
-  :consumer_secret => AppConfig.twitter.consumer_secret,
-}
-
 module TwiMeido
   extend Blather::DSL
 
@@ -73,13 +63,6 @@ MESSAGE
 
   message :chat?, :body do |m|
     @current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
-    TwitterClient.auth = {
-      :type => :oauth,
-      :consumer_key => AppConfig.twitter.consumer_key,
-      :consumer_secret => AppConfig.twitter.consumer_secret,
-      :token => @current_user.oauth_token,
-      :token_secret => @current_user.oauth_token_secret
-    }
     response = process_message(@current_user, m)
     send_message(m.from, response)
   end
