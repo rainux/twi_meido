@@ -113,6 +113,18 @@ MESSAGE
   end
 end
 
+module EM
+  class << self
+    attr_reader :threadqueue
+  end
+end
+
 EM.run do
+  EM.add_periodic_timer(2) do
+    if EM.threadqueue && EM.threadqueue.size > 0
+      puts "#{Time.now.to_s :db} Defered jobs queued: #{EM.threadqueue.size}"
+    end
+  end
+
   TwiMeido.run
 end
