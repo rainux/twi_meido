@@ -43,16 +43,18 @@ After that you'll get a PIN code, use it with -bind command to complete the OAut
         )
         user.reconnect_user_streams
 
-      rescue OAuth::Unauthorized
-        return 'OAuth with Twitter failed, please retry by use -oauth command.'
-      end
-
-      <<-MESSAGE
+        response = <<-MESSAGE
 Successfully bound your Twitter account, now you can:
 * Use commands to access your Twitter account.
 * Receive tweets which contain your username nearly real-time.
 * Tweet to Twitter by directly send your tweets.
-      MESSAGE
+        MESSAGE
+
+      rescue OAuth::Unauthorized
+        response = 'OAuth with Twitter failed, please retry by use -oauth command.'
+      end
+
+      response
     end
 
     define_command :on, /\Aon(?:\s+(.*))?\Z/i do |user, message, params|
