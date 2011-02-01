@@ -69,9 +69,14 @@ MESSAGE
   end
 
   message :chat?, :body do |m|
-    self.current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
-    response = process_message(current_user, m)
-    send_message(m.from, response)
+    operation = lambda {
+      self.current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
+      process_message(current_user, m)
+    }
+    callback = lambda {|response|
+      send_message(m.from, response)
+    }
+    EM.defer(operation, callback)
   end
 
   def self.process_user_stream(item)
