@@ -31,8 +31,15 @@ module TwiMeido
   VERSION = '0.1.0'
 
   class << self
-    attr_accessor :current_user
     attr_accessor :user_streams
+
+    def current_user
+      Thread.current[:current_user]
+    end
+
+    def current_user=(user)
+      Thread.current[:current_user] = user
+    end
   end
 
   def self.run
@@ -62,8 +69,8 @@ MESSAGE
   end
 
   message :chat?, :body do |m|
-    @current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
-    response = process_message(@current_user, m)
+    self.current_user = User.first_or_create(:jabber_id => m.from.stripped.to_s)
+    response = process_message(current_user, m)
     send_message(m.from, response)
   end
 
