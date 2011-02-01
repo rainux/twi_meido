@@ -196,10 +196,17 @@ class User
 
   def setup_rest_polling
     @rest_polling_timer = EM.add_periodic_timer(90) do
-      TwiMeido.current_user = self
 
-      pull_mentions if notification.include?(:mention)
-      pull_dms if notification.include?(:dm)
+      if notification.include?(:mention) || notification.include?(:dm)
+
+        pull_rest_api = lambda {
+          TwiMeido.current_user = self
+          pull_mentions if notification.include?(:mention)
+          pull_dms if notification.include?(:dm)
+        }
+
+        EM.defer(pull_rest_api)
+      end
     end
   end
 
