@@ -53,6 +53,15 @@ Unfollow the specified user.
  if username [another_username]
 Show follow relationship between you and the specified user, or between specified 2 users.
 
+ b username
+Block the specified username.
+
+ unb username
+Unblock the specified username.
+
+ ib username
+Show whether you have blocked username.
+
  re tweet_id
 Retweet the specified tweet, this is the "official retweet".
 
