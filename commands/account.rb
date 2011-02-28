@@ -189,5 +189,40 @@ Please make sure you've turned track on via command -on track.
 
       message
     end
+
+    define_command :block, /\Ab\s+(\S+)\Z/i do |user, message, params|
+      screen_name = params[1]
+ 
+      TwiMeido.current_user.rest_api_client.blocks.create!(:screen_name => scree
+n_name)
+      "You're now blocking @#{screen_name}."
+    end
+ 
+    define_command :unblock, /\Aunb\s+(\S+)\Z/i do |user, message, params|
+      screen_name = params[1]
+ 
+      TwiMeido.current_user.rest_api_client.blocks.destroy!(:screen_name => scre
+en_name)
+ 
+      "You're no longer blocking @#{screen_name} now."
+    end
+ 
+    define_command :if_block, /\Aib\s+(\S+)\Z/i do |user, message, params|
+      begin
+        screen_name = params[1]
+ 
+        TwiMeido.current_user.rest_api_client.blocks.exists?(:screen_name => scr
+een_name)
+        message = "You're blocking @#{screen_name}."
+      rescue Grackle::TwitterError => error
+        if error.status == 404
+          message = "You're not blocking @#{screen_name}."
+        else
+          raise error
+        end
+      end
+ 
+      message
+    end
   end
 end
