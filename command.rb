@@ -103,14 +103,14 @@ module TwiMeido
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
 #{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
-[ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} ]
-[ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} #{'[GEO] ' if tweet.geo.present?}]
+[ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
 #{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
-[ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} ]
+[ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
       else
