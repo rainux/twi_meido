@@ -111,6 +111,15 @@ Run without parameter will delete the latest tweet.
 Show the specified tweet, with conversation if available.
 Conversation length default to 5.
 
+ loc oauth
+Start an OAuth process to bind your Google Latitude account.
+
+ loc bind
+Use the PIN code you've got from -loc oauth command to actually bind your Google Latitude account.
+
+ loc on|off
+Turn on/off geotag for tweets you send.
+
  help
 Show this help.
         HELP

@@ -8,6 +8,11 @@ class User
   key :request_token_secret,    String
   key :oauth_token,             String, :index => true
   key :oauth_token_secret,      String, :index => true
+  key :loc_request_token,       String
+  key :loc_request_token_secret,String
+  key :loc_oauth_token,         String, :index => true
+  key :loc_oauth_token_secret,  String, :index => true
+  key :loc_on,                  Integer, :default => -1
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
