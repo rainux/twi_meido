@@ -135,6 +135,7 @@ DEPENDENCIES
   irbtools
   irbtools-more
   mongo_mapper
+  oauth
   twitter-stream!
   twitter_oauth
   yajl-ruby
