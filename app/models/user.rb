@@ -8,6 +8,11 @@ class User
   key :request_token_secret,    String
   key :oauth_token,             String, :index => true
   key :oauth_token_secret,      String, :index => true
+  key :latitude_request_token,        String
+  key :latitude_request_token_secret, String
+  key :latitude_oauth_token,          String, :index => true
+  key :latitude_oauth_token_secret,   String, :index => true
+  key :latitude_on,                   Integer, :default => -1
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :viewed_tweet_ids,        Array
@@ -57,6 +62,31 @@ class User
         :token_secret => oauth_token_secret
       }
     end
+  end
+
+ def update_status!(data)
+    if latitude_on == 1
+      client = OAuth::Consumer.new(
+        AppConfig.google.consumer_key,
+        AppConfig.google.consumer_secret,
+        { :site => 'https://www.google.com',
+          :request_token_path => '/accounts/OAuthGetRequestToken',
+          :access_token_path => '/accounts/OAuthGetAccessToken',
+          :authorize_path => '/latitude/apps/OAuthAuthorizeToken',
+          :signature_method => 'HMAC-SHA1'
+        }
+      )
+      access_token = OAuth::AccessToken.new(
+        client,
+        latitude_oauth_token,
+        latitude_oauth_token_secret
+      )
+      latitude = JSON.parse(access_token.get('https://www.googleapis.com/latitude/v1/currentLocation?granularity=best&key=' + AppConfig.google.access_key).body)
+      loc = {:lat => latitude['data']['latitude'], :lon => latitude['data']['longitude']}
+    else
+      loc = {}
+    end
+    rest_api_client.statuses.update! data.merge(loc)
   end
 
   def view_tweet!(tweet)

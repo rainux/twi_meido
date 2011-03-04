@@ -37,7 +37,7 @@ Your tweet has #{length} characters which has reached the 140 limitation, ご主
         MESSAGE
 
       else
-        TwiMeido.current_user.rest_api_client.statuses.update!(:status => text)
+        TwiMeido.current_user.update_status!(:status => text)
 
         <<-MESSAGE
 Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your comment, ご主人様.
@@ -51,7 +51,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
 
       in_reply_to_tweet = user.fetch_tweet(id)
 
-      TwiMeido.current_user.rest_api_client.statuses.update!(
+      TwiMeido.current_user.update_status!(
         :status => "@#{in_reply_to_tweet.user.screen_name} #{status}",
         :in_reply_to_status_id => in_reply_to_tweet.id
       )
@@ -72,7 +72,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
         ["@#{in_reply_to_tweet.user.screen_name.downcase}", "@#{TwiMeido.current_user.screen_name.downcase}"].include?(user.downcase)
       end
       mentioned_users.unshift "@#{in_reply_to_tweet.user.screen_name}"
-      TwiMeido.current_user.rest_api_client.statuses.update!(
+      TwiMeido.current_user.update_status!(
         :status => "#{mentioned_users.join ' '} #{status}",
         :in_reply_to_status_id => in_reply_to_tweet.id
       )

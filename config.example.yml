@@ -8,3 +8,9 @@ twitter:
   consumer_secret:
   username:
   password:
+
+google:
+  consumer_key:
+  consumer_secret:
+  access_key:
+  domain:
