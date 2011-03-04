@@ -12,7 +12,8 @@ module TwiMeido
         "Don't panic!"
       else
         <<-HELP
-* Send messages to me, I'll tweet them for you.
+* Send messages to me, I'll tweet tcommands/utility.rb
+hem for you.
 * Any messages begin with " "(space) or "-" character are treat as commands.
 * Start use me by send " oauth" command to bind your Twitter account.
 * Follow @TwiMeido for development news.
@@ -52,6 +53,18 @@ Unfollow the specified user.
 
  if username [another_username]
 Show follow relationship between you and the specified user, or between specified 2 users.
+
+ b username
+Block the specified username.
+
+ unb username
+Unblock the specified username.
+
+ ib username
+Show whether you have blocked username.
+
+ spam username
+Report the specified username as spam.
 
  re tweet_id
 Retweet the specified tweet, this is the "official retweet".
