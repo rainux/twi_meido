@@ -188,7 +188,7 @@ Successfully deleted your tweet #{id}.
       length = params[2].to_i
       length = 5 if length.zero?
 
-      format_tweet(user.fetch_tweet(id), true, length)
+      format_tweet(user.fetch_tweet(id), true, length, true)
     end
 
     define_command :favorite, /\Afav\s+(\d+|[a-z]+)\Z/i do |user, message, params|

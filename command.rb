@@ -73,7 +73,7 @@ module TwiMeido
       message
     end
 
-    def format_tweet(tweet, shorten_id = true, conversation_length = 1)
+    def format_tweet(tweet, shorten_id = true, conversation_length = 1, location = false)
       conversation = load_conversation(tweet, shorten_id, conversation_length)
       if conversation
         conversation = conversation.flatten.compact.join("\n")
@@ -85,7 +85,7 @@ module TwiMeido
         CONVERSATION
         conversation.chomp!
       end
-      formatted_tweet = format_single_tweet(tweet, shorten_id, conversation)
+      formatted_tweet = format_single_tweet(tweet, shorten_id, conversation, location)
     end
 
     def load_conversation(tweet, shorten_id = true, conversation_length = 5)
@@ -98,7 +98,7 @@ module TwiMeido
       end
     end
 
-    def format_single_tweet(tweet, shorten_id = true, conversation = nil)
+    def format_single_tweet(tweet, shorten_id = true, conversation = nil, location = false)
 
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
@@ -118,6 +118,16 @@ module TwiMeido
 #{tweet.inspect}
         TWEET
       end
+
+      if location
+        if tweet.geo.present?
+          reverse = Geokit::Geocoders::GoogleGeocoder.reverse_geocode "#{tweet.geo['coordinates'][0]},#{tweet.geo['coordinates'][1]}"
+        elsif tweet.retweeted_status.geo.present?
+          reverse = Geokit::Geocoders::GoogleGeocoder.reverse_geocode "#{tweet.retweeted_status.geo['coordinates'][0]},#{tweet.retweeted_status.geo['coordinates'][1]}"
+        end
+        formatted_tweet += "[ Sent from #{reverse.full_address}. ]" if reverse
+      end
+      formatted_tweet
     end
 
     def format_event(event)

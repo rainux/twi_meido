@@ -54,6 +54,7 @@ GEM
       wirb
     g (1.4.0)
       ruby-growl (>= 1.0.1)
+    geokit (1.5.0)
     grackle (0.1.10)
       json
       mime-types
@@ -129,6 +130,7 @@ DEPENDENCIES
   awesome_print
   blather
   bson_ext
+  geokit
   grackle
   hashie!
   irb_rocket
