@@ -96,7 +96,32 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
         case error.status
         when 403
           response = "Can't sent dm to @#{screen_name} since he/she is not following you, ご主人様."
-        when 404
+        whena 404
+          response = "The user @#{screen_name} is not exists, ご主人様."
+        end
+      end
+
+      response
+    end
+
+    define_command :reply_direct_message, /\Ard\s+(\S+)\s+(\S+)\Z/i do |user, message, params|
+      id = params[1]
+      text = params[2]
+
+      in_reply_to_dm = user.fetch_dm(id)
+      screen_name = in_reply_to_dm.sender.screen_name
+
+      begin
+        dm = TwiMeido.current_user.rest_api_client.direct_messages.new!(
+          :screen_name => screen_name, :text => text
+        )
+        response = "Successfully replied to @#{screen_name}'s DM, ご主人様."
+
+      rescue Grackle::TwitterError => error
+        case error.status
+        when 403
+          response = "Can't sent dm to @#{screen_name} since he/she is not following you, ご主人様."
+        whena 404
           response = "The user @#{screen_name} is not exists, ご主人様."
         end
       end

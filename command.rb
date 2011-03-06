@@ -186,12 +186,13 @@ module TwiMeido
       end
     end
 
-    def format_dm(dm)
+    def format_dm(dm, shorten_id = true)
       TwiMeido.current_user.view_dm!(dm)
 
       formatted_dm = <<-DM
 DM from #{dm.sender.screen_name} (#{dm.sender.name}):
 #{CGI.unescapeHTML(dm.text)}
+[ #{dm_id_info(dm, shorten_id)} ]
       DM
     end
 
@@ -229,6 +230,15 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     def id_info(tweet, shorten_id)
       if shorten_id
         short_id = TwiMeido.current_user.view_tweet!(tweet)
+        "##{short_id.to_b26} = ##{short_id}"
+      else
+        "##{tweet.id.to_b26} = ##{tweet.id}"
+      end
+    end
+
+    def dm_id_info(dm, shorten_id)
+      if shorten_id
+        short_id = TwiMeido.current_user.view_dm!(dm)
         "##{short_id.to_b26} = ##{short_id}"
       else
         "##{tweet.id.to_b26} = ##{tweet.id}"

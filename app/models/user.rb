@@ -122,13 +122,35 @@ class User
     end
   end
 
+  def viewed_dm(short_id)
+    DirectMessage.find(viewed_dm_ids[short_id])
+  end
+
+  def fetch_dm(short_id_or_dm_id)
+    if short_id_or_dm_id.respond_to?(:is_valid_b26?) && short_id_or_dm_id.is_valid_b26?
+      short_id_or_dm_id = short_id_or_dm_id.as_b26_to_i
+    else
+      short_id_or_dm_id = short_id_or_dm_id.to_i
+    end
+    if short_id_or_dm_id < 1000
+      viewed_dm(short_id_or_dm_id)
+    else
+      DirectMessage.fetch(short_id_or_dm_id)
+    end
+  end
+
   def view_dm!(dm)
-    short_id = viewed_dm_ids.index(dm.id)
+    DirectMessage.create(dm) unless dm.kind_of?(DirectMessage) || viewed_dm_ids.include?(dm.id)
+    view_dm_id!(dm.id)
+  end
+
+  def view_dm_id!(dm_id)
+    short_id = viewed_dm_ids.index(dm_id)
     return short_id if short_id
 
     self.last_dm_short_id = -1 if self.last_dm_short_id >= MaxShortId
     self.last_dm_short_id += 1
-    viewed_dm_ids[self.last_dm_short_id] = dm.id
+    viewed_dm_ids[self.last_dm_short_id] = dm_id
     save
     self.last_dm_short_id
   end
