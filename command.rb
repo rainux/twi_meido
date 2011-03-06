@@ -256,7 +256,8 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
         (current_user.notification.include?(:track) && current_user.tracking?(tweet))
 
-        unless current_user.viewed_tweet_ids.include?(tweet.id)
+        unless current_user.viewed_tweet_ids.include?(tweet.id) ||
+          (tweet.retweeted_status.present? && current_user.viewed_tweet_ids.include?(tweet.retweeted_status.id))
           User.create_or_update_from_tweet(tweet)
           format_tweet(tweet)
         end
