@@ -21,6 +21,7 @@ class User
   key :last_dm_short_id,        Integer, :default => -1
   key :last_mention_id,         Integer
   key :last_dm_id,              Integer
+  key :blocked_user_ids,        Array
   timestamps!
 
   key :screen_name,             String
@@ -193,6 +194,16 @@ class User
     !found.empty?
   end
 
+  def update_blocked_user_ids
+    blocked_user_ids ||= []
+    users = rest_api_client.blocks.blocking? # wtf Twitter would ignore :page
+    users.collect! do |user|
+      blocked_user_ids += [id]
+    end
+    blocked_user_ids.uniq!
+    save
+  end
+
   def connect_user_streams
     stream = Twitter::JSONStream.connect(
       :host => 'userstream.twitter.com',
@@ -241,6 +252,7 @@ class User
 
     puts "User streams for #{screen_name} connected"
     TwiMeido.user_streams[id] = stream
+    update_blocked_user_ids
   end
 
   def reconnect_user_streams

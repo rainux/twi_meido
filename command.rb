@@ -268,13 +268,29 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
 
         unless current_user.viewed_tweet_ids.include?(tweet.id) ||
           (tweet.retweeted_status.present? && current_user.viewed_tweet_ids.include?(tweet.retweeted_status.id))
+
           User.create_or_update_from_tweet(tweet)
-          format_tweet(tweet)
+          unless current_user.blocked_user_ids.include?(tweet.user.id) ||
+            (tweet.retweeted_status.present? && current_user.blocked_user_ids.include?(tweet.retweeted_status.user.id))
+
+            format_tweet(tweet)
+          end
         end
       end
     end
 
     def extract_event(event)
+      if event.source.present? && event.source.screen_name == current_user.screen_name
+        if event.event == 'block'
+          current_user.blocked_user_ids += [event.target.id]
+          current_user.blocked_user_ids.uniq!
+          current_user.save
+        elsif event.event == 'unblock'
+          current_user.blocked_user_ids -= [event.target.id]
+          current_user.blocked_user_ids.uniq!
+          current_user.save
+        end
+      end
       if current_user.notification.include?(:event)
         format_event(event)
       end
