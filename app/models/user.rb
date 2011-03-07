@@ -65,25 +65,33 @@ class User
   end
 
  def update_status!(data)
-    if latitude_on == 1
-      client = OAuth::Consumer.new(
-        AppConfig.google.consumer_key,
-        AppConfig.google.consumer_secret,
-        { :site => 'https://www.google.com',
-          :request_token_path => '/accounts/OAuthGetRequestToken',
-          :access_token_path => '/accounts/OAuthGetAccessToken',
-          :authorize_path => '/latitude/apps/OAuthAuthorizeToken',
-          :signature_method => 'HMAC-SHA1'
-        }
-      )
-      access_token = OAuth::AccessToken.new(
-        client,
-        latitude_oauth_token,
-        latitude_oauth_token_secret
-      )
-      latitude = JSON.parse(access_token.get('https://www.googleapis.com/latitude/v1/currentLocation?granularity=best&key=' + AppConfig.google.access_key).body)
-      loc = {:lat => latitude['data']['latitude'], :lon => latitude['data']['longitude']}
-    else
+    begin
+      if latitude_on == 1
+        client = OAuth::Consumer.new(
+          AppConfig.google.consumer_key,
+          AppConfig.google.consumer_secret,
+          { :site => 'https://www.google.com',
+            :request_token_path => '/accounts/OAuthGetRequestToken',
+            :access_token_path => '/accounts/OAuthGetAccessToken',
+            :authorize_path => '/latitude/apps/OAuthAuthorizeToken',
+            :signature_method => 'HMAC-SHA1'
+          }
+        )
+        access_token = OAuth::AccessToken.new(
+          client,
+          latitude_oauth_token,
+          latitude_oauth_token_secret
+        )
+        latitude = JSON.parse(access_token.get('https://www.googleapis.com/latitude/v1/currentLocation?granularity=best&key=' + AppConfig.google.access_key).body)
+        loc = {:lat => latitude['data']['latitude'], :lon => latitude['data']['longitude']}
+      else
+        loc = {}
+      end
+    rescue OAuth::Error
+      latitude_oauth_token = nil
+      latitude_oauth_token_secret = nil
+      latitude_on = 0
+      save
       loc = {}
     end
     rest_api_client.statuses.update! data.merge(loc)
