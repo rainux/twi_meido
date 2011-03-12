@@ -17,7 +17,7 @@ module TwiMeido
 
       <<-MESSAGE
 Please visit the following URL to confirm your OAuth request:
-#{request_token.authorize_url}
+#{Googl.shorten(request_token.authorize_url).short_url}
 After that you'll get a PIN code, use it with -bind command to complete the OAuth process like this:
 -bind PIN_CODE
       MESSAGE
