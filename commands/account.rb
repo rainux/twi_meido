@@ -17,7 +17,7 @@ module TwiMeido
 
       <<-MESSAGE
 Please visit the following URL to confirm your OAuth request:
-#{request_token.authorize_url}
+#{Googl.shorten(request_token.authorize_url).short_url}
 After that you'll get a PIN code, use it with -bind command to complete the OAuth process like this:
 -bind PIN_CODE
       MESSAGE
@@ -137,7 +137,7 @@ Please make sure you've turned track on via command -on track.
 
       begin
         target_user = TwiMeido.current_user.rest_api_client.friendships.create!(:screen_name => screen_name)
-        if !target_user.following && target.protected
+        if !target_user.following && target_user.protected
           message = "Since @#{screen_name} is protected, a follow request has been sent, ご主人様."
         else
           message = "You're now following @#{screen_name}, ご主人様."

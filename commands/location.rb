@@ -23,7 +23,7 @@ module TwiMeido
 
       <<-MESSAGE
 Please visit the following URL to confirm your OAuth request:
-#{request_token.authorize_url}&domain=#{AppConfig.google.domain}&granularity=best
+#{Googl.shorten(request_token.authorize_url + '&domain=' + AppConfig.google.domain + '&granularity=best').short_url}
 After that you'll get a PIN code, use it with -latitude bind command to complete the OAuth process like this:
 -latitude bind PIN_CODE
       MESSAGE

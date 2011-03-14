@@ -13,6 +13,7 @@ gem 'actionpack', :require => 'action_view'
 gem 'hashie', :git => 'git://github.com/rainux/hashie.git'
 gem 'yajl-ruby', :require => 'yajl/json_gem'
 gem 'awesome_print', :require => 'ap'
+gem 'googl'
 
 group :development do
   gem 'awesome_print', :require => 'ap'
