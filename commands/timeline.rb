@@ -82,7 +82,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       MESSAGE
     end
 
-    define_command :direct_message, /\Ad\s+(\S+)\s+(\S+)\Z/i do |user, message, params|
+    define_command :direct_message, /\Ad\s+(\S+)\s+(.+)\Z/i do |user, message, params|
       screen_name = params[1]
       text = params[2]
 
@@ -104,7 +104,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       response
     end
 
-    define_command :reply_direct_message, /\Ard\s+(\S+)\s+(\S+)\Z/i do |user, message, params|
+    define_command :reply_direct_message, /\Ard\s+(\S+)\s+(.+)\Z/i do |user, message, params|
       id = params[1]
       text = params[2]
 
