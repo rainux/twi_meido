@@ -170,20 +170,22 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
     define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/i do |user, message, params|
       begin
         screen_name = params[1] ? params[1] : user.screen_name
-        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name)
+        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name, :count => 3) # XXX count changeable?
         tweets.collect! do |tweet|
           format_tweet(tweet)
         end
-        tweets = tweets.reverse.join("\n")
+        message = tweets.reverse.join("\n")
       rescue Grackle::TwitterError => error
         if error.status == 401
-          tweets = "@#{screen_name} is protected, ご主人様."
+          message = "@#{screen_name} is protected, ご主人様."
         else
           raise error
         end
       end
+      profile = TwiMeido.current_user.rest_api_client.users.show?(:screen_name => screen_name)
+      message += "\n" + format_profile(profile)
 
-      tweets
+      message
     end
 
     define_command :delete, /\Adel(?:\s+(\d+|[a-z]+))?\Z/i do |user, message, params|
