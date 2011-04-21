@@ -5,11 +5,11 @@ module TwiMeido
     define_command :retweet, /\Are\s+(\d+|[a-z]+)\Z/i do |user, message, params|
       id = params[1]
 
-      id = user.fetch_tweet(id).id if is_short_id(id)
-      TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => id)
+      tweet = user.fetch_tweet(id)
+      TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => tweet.id)
 
       <<-MESSAGE
-Successfully retweeted tweet #{id}, ご主人様.
+Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様.
       MESSAGE
     end
 
@@ -40,7 +40,7 @@ Your tweet has #{length} characters which has reached the 140 limitation, ご主
         TwiMeido.current_user.update_status!(:status => text)
 
         <<-MESSAGE
-Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your comment, ご主人様.
+Successfully retweeted #{tweet.user.screen_name}'s tweet #{id_info(tweet, true)} with your comment, ご主人様.
         MESSAGE
       end
     end
@@ -57,7 +57,7 @@ Successfully retweeted #{tweet.user.screen_name}'s tweet #{tweet.id} with your c
       )
 
       <<-MESSAGE
-Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply_to_tweet.id}, ご主人様.
+Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{id_info(in_reply_to_tweet, true)}, ご主人様.
       MESSAGE
     end
 
@@ -78,7 +78,7 @@ Successfully replied to #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply
       )
 
       <<-MESSAGE
-Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_name}'s tweet #{in_reply_to_tweet.id}, ご主人様.
+Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_name}'s tweet #{id_info(in_reply_to_tweet, true)}, ご主人様.
       MESSAGE
     end
 
