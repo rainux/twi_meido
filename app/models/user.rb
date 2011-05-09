@@ -238,7 +238,7 @@ class User
       puts "Max reconnects: timeout #{timeout}, #{retries} retries."
     end
 
-    puts "User streams for #{screen_name} connected"
+    puts "#{Time.now.to_s :db} User streams for #{screen_name} connected"
     TwiMeido.user_streams[id] = stream
   end
 
@@ -290,7 +290,8 @@ class User
     update_attributes(:last_mention_id => tweets.first.id)
 
     sleep 5
-  rescue
+  rescue => e
+    puts "#{Time.now.to_s :db} #{e.inspect}"
   end
 
   def pull_dms
@@ -311,7 +312,8 @@ class User
     update_attributes(:last_dm_id => dms.first.id)
 
     sleep 5
-  rescue
+  rescue => e
+    puts "#{Time.now.to_s :db} #{e.inspect}"
   end
 
   def update_blocked_user_ids
@@ -320,6 +322,7 @@ class User
     save
 
     sleep 5
-  rescue
+  rescue => e
+    puts "#{Time.now.to_s :db} #{e.inspect}"
   end
 end
