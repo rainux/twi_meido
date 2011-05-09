@@ -265,7 +265,7 @@ class User
   end
 
   def setup_rest_polling
-    @rest_polling_timer = EM.add_periodic_timer(90) do
+    @rest_polling_timer = EM.add_periodic_timer(300) do
 
       if notification.include?(:mention) || notification.include?(:dm)
 
@@ -298,6 +298,8 @@ class User
 
     TwiMeido.process_rest_polling(tweets)
     update_attributes(:last_mention_id => tweets.first.id)
+
+    sleep 5
   rescue
   end
 
@@ -317,6 +319,8 @@ class User
 
     TwiMeido.process_rest_polling(prepared_dms)
     update_attributes(:last_dm_id => dms.first.id)
+
+    sleep 5
   rescue
   end
 end
