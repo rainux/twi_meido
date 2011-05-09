@@ -102,7 +102,7 @@ MESSAGE
 
   def self.send_message(user, message)
     # The trailing space can prevent Google Talk chomp the blank line
-    message = message.rstrip + "\n "
+    message = message.rstrip + "\n\n "
     jabber_id = user.respond_to?(:jabber_id) ? user.jabber_id : user
     say jabber_id, message
   end
