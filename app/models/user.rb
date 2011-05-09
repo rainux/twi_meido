@@ -192,16 +192,6 @@ class User
     !found.empty?
   end
 
-  def update_blocked_user_ids
-    blocked_user_ids ||= []
-    users = rest_api_client.blocks.blocking? # wtf Twitter would ignore :page
-    users.collect! do |user|
-      blocked_user_ids += [id]
-    end
-    blocked_user_ids.uniq!
-    save
-  end
-
   def connect_user_streams
     stream = Twitter::JSONStream.connect(
       :host => 'userstream.twitter.com',
@@ -250,7 +240,6 @@ class User
 
     puts "User streams for #{screen_name} connected"
     TwiMeido.user_streams[id] = stream
-    update_blocked_user_ids
   end
 
   def reconnect_user_streams
@@ -273,6 +262,7 @@ class User
           TwiMeido.current_user = self
           pull_mentions if notification.include?(:mention)
           pull_dms if notification.include?(:dm)
+          update_blocked_user_ids
         }
 
         EM.defer(pull_rest_api)
@@ -319,6 +309,15 @@ class User
 
     TwiMeido.process_rest_polling(prepared_dms)
     update_attributes(:last_dm_id => dms.first.id)
+
+    sleep 5
+  rescue
+  end
+
+  def update_blocked_user_ids
+    users = rest_api_client.blocks.blocking? # wtf Twitter would ignore :page
+    blocked_user_ids = users.collect(&:id)
+    save
 
     sleep 5
   rescue
