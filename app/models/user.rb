@@ -169,13 +169,11 @@ class User
   end
 
   def initialize(attrs = {})
-    rename_twitter_user_attributes(attrs)
-    super
+    super(rename_twitter_user_attributes(attrs))
   end
 
   def update_attributes(attrs = {})
-    rename_twitter_user_attributes(attrs)
-    super
+    super(rename_twitter_user_attributes(attrs))
   end
 
   def mentioned_by?(tweet)
@@ -284,8 +282,10 @@ class User
 
   private
   def rename_twitter_user_attributes(attrs)
-    attrs[:twitter_user_id] = attrs.delete(:id) if attrs.key? :id
-    attrs[:twitter_user_created_at] = attrs.delete(:created_at) if attrs.key? :created_at
+    renamed_attrs = attrs.dup
+    renamed_attrs[:twitter_user_id] = renamed_attrs.delete(:id) if renamed_attrs.key? :id
+    renamed_attrs[:twitter_user_created_at] = renamed_attrs.delete(:created_at) if renamed_attrs.key? :created_at
+    renamed_attrs
   end
 
   def pull_mentions
