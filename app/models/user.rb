@@ -232,7 +232,7 @@ class User
       :host => 'userstream.twitter.com',
       :path => '/2/user.json',
       :ssl => true,
-      :user_agent => "TwiMeido/#{TwiMeido::VERSION}",
+      :user_agent => "TwiMeido/#{TwiMeido::Version}",
       :params => params,
       :oauth => {
         :consumer_key    => AppConfig.twitter.consumer_key,

@@ -3,6 +3,7 @@ require 'bundler/setup'
 Bundler.require
 require 'active_support/time_with_zone'
 require 'yaml'
+require 'twi_meido/version'
 
 MongoMapper.database = 'twi_meido'
 
@@ -29,8 +30,6 @@ AppConfig = Hashie::Mash.new(YAML.load_file('config.yml'))
 
 module TwiMeido
   extend Blather::DSL
-
-  VERSION = '0.1.0'
 
   class << self
     attr_accessor :user_streams

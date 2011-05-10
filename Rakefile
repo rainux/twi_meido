@@ -12,6 +12,7 @@ end
 require 'rake'
 
 require 'jeweler'
+require 'lib/twi_meido/version'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = 'TwiMeido'
@@ -21,6 +22,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{TwiMeido is a Twitter client for XMPP clients, e.g. Google Talk. TwiMeido use Twitter Streaming API to monitor and notify the tweets you're interested nearly real-time.}
   gem.email = 'rainux@gmail.com'
   gem.authors = ['Rainux Luo']
+  gem.version = TwiMeido::Version
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
