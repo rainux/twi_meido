@@ -12,7 +12,6 @@ gem 'activesupport'
 gem 'actionpack', :require => 'action_view'
 gem 'hashie'
 gem 'yajl-ruby', :require => 'yajl/json_gem'
-gem 'awesome_print', :require => 'ap'
 gem 'googl'
 
 group :development do
@@ -20,6 +19,10 @@ group :development do
   gem 'irbtools', :require => nil
   gem 'irbtools-more', :require => nil
   gem 'irb_rocket', :require => nil
-end
 
-# vim: set ft=ruby:
+  gem 'rspec', '>= 2.5.0'
+  gem 'yard', '~> 0.6.0'
+  gem 'bundler', '~> 1.0.0'
+  gem 'jeweler', '~> 1.6.0'
+  gem 'rcov', '>= 0'
+end

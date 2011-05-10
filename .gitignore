@@ -1,4 +1,20 @@
+# rcov generated
+coverage
+
+# rdoc generated
+rdoc
+
+# yard generated
+doc
+.yardoc
+
+# bundler
+.bundle
+
+# jeweler generated
+pkg
+
+# TwiMeido
 config.yml
-twi_meido.db
 .bundle
 .rvmrc
