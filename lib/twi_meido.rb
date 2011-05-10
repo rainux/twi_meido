@@ -11,20 +11,20 @@ unless defined?(require_relative)
   alias require_relative require
 end
 
-require_relative 'base26'
-require_relative 'grackle_ext'
-require_relative 'mash_ext'
-require_relative 'command'
-require_relative 'app/models/user'
-require_relative 'app/models/tweet'
-require_relative 'app/models/directmessage'
-require_relative 'commands/repeat'
-require_relative 'commands/account'
-require_relative 'commands/location'
-require_relative 'commands/timeline'
-require_relative 'commands/utility'
-require_relative 'commands/not_implemented'
-require_relative 'commands/tweet'
+require 'twi_meido/base26'
+require 'twi_meido/grackle_ext'
+require 'twi_meido/mash_ext'
+require 'twi_meido/command'
+require 'app/models/user'
+require 'app/models/tweet'
+require 'app/models/directmessage'
+require 'twi_meido/commands/repeat'
+require 'twi_meido/commands/account'
+require 'twi_meido/commands/location'
+require 'twi_meido/commands/timeline'
+require 'twi_meido/commands/utility'
+require 'twi_meido/commands/not_implemented'
+require 'twi_meido/commands/tweet'
 
 AppConfig = Hashie::Mash.new(YAML.load_file('config.yml'))
 
