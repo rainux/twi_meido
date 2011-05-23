@@ -53,13 +53,14 @@ module TwiMeido
   setup AppConfig.meido.jabber_id, AppConfig.meido.password, AppConfig.meido.host
 
   when_ready do
-    puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
-
     client.roster.each do |jid, roster_item|
       discover :info, jid, nil
     end
 
     connect_user_streams
+    set_status :available, AppConfig.meido.status_msg
+
+    puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
   end
 
   subscription :request? do |s|
