@@ -101,11 +101,29 @@ MESSAGE
     end
   end
 
+  class << client
+    def unregister_tmp_handler(id)
+      @tmp_handlers.delete(id.to_s)
+    end
+  end
+
   def self.send_message(user, message)
     # The trailing space can prevent Google Talk chomp the blank line
     message = message.rstrip + "\n\n "
     jabber_id = user.respond_to?(:jabber_id) ? user.jabber_id : user
-    say jabber_id, message
+    # Send messages to user only when online.
+    stanza = Blather::Stanza::Presence.new
+    stanza.id = stanza.object_id
+    stanza.type = :probe
+    stanza.to = Blather::JID.new(jabber_id).strip! # Fail w/ resource?
+    callback = lambda {
+      say jabber_id, message
+    }
+    client.register_tmp_handler stanza.id, &callback
+    EM::Timer.new(2) do # 2 secs should be enough.
+      client.unregister_tmp_handler stanza.id
+    end
+    client.write stanza
   end
 
   def self.connect_user_streams
