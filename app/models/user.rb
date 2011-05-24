@@ -15,6 +15,7 @@ class User
   key :latitude_on,                   Integer, :default => -1
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
+  key :home_was_on,             Integer, :default => -1
   key :viewed_tweet_ids,        Array
   key :last_short_id,           Integer, :default => -1
   key :viewed_dm_ids,           Array

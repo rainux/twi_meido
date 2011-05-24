@@ -84,6 +84,45 @@ MESSAGE
     EM.defer(operation, callback)
   end
 
+  class << client
+    def unregister_tmp_handler(id)
+      @tmp_handlers.delete(id.to_s)
+    end
+  end
+
+  status :state => :unavailable do |s|
+    user = User.first_or_create(:jabber_id => s.from.stripped.to_s)
+    stanza = Blather::Stanza::Presence.new
+    stanza.id = stanza.object_id
+    stanza.type = :probe
+    stanza.to = s.from.strip! # Fail w/ resource?
+    timer = EM::Timer.new(2) do
+      client.unregister_tmp_handler stanza.id
+      if user.notification.include? :home
+        user.home_was_on = 1
+        user.notification -= [:home]
+      else
+        user.home_was_on = 0
+      end
+      user.save
+    end
+    callback = lambda {
+      timer.cancel
+    }
+    client.register_tmp_handler stanza.id, &callback
+    client.write stanza
+    true # Ensure the general handler is not called.
+  end
+
+  status do |s|
+    user = User.first_or_create(:jabber_id => s.from.stripped.to_s)
+    if user.home_was_on == 1
+      user.home_was_on = -1
+      user.notification += [:home]
+      user.save
+    end
+  end
+
   def self.process_user_stream(item)
     notification = extract_notification(item)
     send_message(current_user, notification) if notification
@@ -101,29 +140,11 @@ MESSAGE
     end
   end
 
-  class << client
-    def unregister_tmp_handler(id)
-      @tmp_handlers.delete(id.to_s)
-    end
-  end
-
   def self.send_message(user, message)
     # The trailing space can prevent Google Talk chomp the blank line
     message = message.rstrip + "\n\n "
     jabber_id = user.respond_to?(:jabber_id) ? user.jabber_id : user
-    # Send messages to user only when online.
-    stanza = Blather::Stanza::Presence.new
-    stanza.id = stanza.object_id
-    stanza.type = :probe
-    stanza.to = Blather::JID.new(jabber_id).strip! # Fail w/ resource?
-    callback = lambda {
-      say jabber_id, message
-    }
-    client.register_tmp_handler stanza.id, &callback
-    EM::Timer.new(2) do # 2 secs should be enough.
-      client.unregister_tmp_handler stanza.id
-    end
-    client.write stanza
+    say jabber_id, message
   end
 
   def self.connect_user_streams
