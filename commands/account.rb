@@ -103,29 +103,60 @@ Currently you've turned on #{user.notification.join(' ')}.
 
     define_command :track, /\Atrack(?:\s+(.*))?\Z/i do |user, message, params|
       keywords = params[1].to_s.split(/\s+/)
-      user.tracking_keywords += keywords
+      keywords.each do |keyword|
+        keyword.downcase!
+        if keyword[0] == 45 # '-'
+          user.tracking_keywords -= [keyword[1..-1]]
+        else
+          user.tracking_keywords += [keyword]
+        end
+      end
       user.tracking_keywords.uniq!
       user.save
-      user.reconnect_user_streams
+      user.reconnect_user_streams unless keywords == []
 
-      <<-MESSAGE
-ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
-Please make sure you've turned track on via command -on track.
-      MESSAGE
+      "Now tracking in home: \"#{user.tracking_keywords.join(' ')}\", ご主人様."
     end
 
-    define_command :untrack, /\Auntrack(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].split(/\s+/)
-      user.tracking_keywords -= keywords
-      user.tracking_keywords.uniq!
+    define_command :world, /\Aworld(?:\s+(.*))?\Z/i do |user, message, params|
+      keywords = params[1].to_s.split(/\s+/)
+      keywords.each do |keyword|
+        keyword.downcase!
+        if keyword[0] == 45 # '-'
+          user.tracking_keywords_world -= [keyword[1..-1]]
+        else
+          user.tracking_keywords_world += [keyword]
+        end
+      end
+      user.tracking_keywords_world.uniq!
       user.save
-      user.reconnect_user_streams
+      user.reconnect_user_streams unless keywords == []
 
-      <<-MESSAGE
-ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
-Please make sure you've turned track on via command -on track.
-      MESSAGE
+      "Now tracking globally: \"#{user.tracking_keywords_world.join(' ')}\", ご主人様."
     end
+
+    # NOTE: Not implemented by Twitter.
+    #
+    #define_command :user, /\Auser(?:\s+(.*))?\Z/i do |user, message, params|
+    #  keywords = params[1].to_s.split(/\s+/)
+    #  keywords.each do |keyword|
+    #    begin
+    #      result = TwiMeido.current_user.rest_api_client.users.show? :screen_name => keyword.sub(/^-?@?/, '')
+    #      if keyword[0] == 45 # wtf?
+    #        user.tracking_keywords_user -= [result.id]
+    #      else
+    #        user.tracking_keywords_user += [result.id]
+    #      end
+    #    rescue Grackle::TwitterError
+    #      nil
+    #    end
+    #  end
+    #  user.tracking_keywords_user.uniq!
+    #  user.save
+    #  user.reconnect_user_streams unless keywords == []
+    #
+    #  "Now tracking users: \"#{user.tracking_keywords_user.join(' ')}\", ご主人様."
+    #end
 
     define_command :reconnect, /\Areconnect\Z/i do |user, message|
       user.reconnect_user_streams
