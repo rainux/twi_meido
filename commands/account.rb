@@ -113,7 +113,6 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
       user.tracking_keywords.uniq!
       user.save
-      user.reconnect_user_streams unless keywords == []
 
       "Now tracking in home: \"#{user.tracking_keywords.join(' ')}\", ご主人様."
     end
