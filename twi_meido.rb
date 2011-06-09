@@ -4,7 +4,6 @@ require 'rubygems'
 require 'bundler/setup'
 Bundler.require
 require 'active_support/time_with_zone'
-require 'cgi'
 require 'yaml'
 
 MongoMapper.database = 'twi_meido'

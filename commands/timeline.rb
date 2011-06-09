@@ -151,7 +151,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets = TwiMeido.current_user.rest_api_client.direct_messages?
       tweets.collect! do |tweet|
         <<-DM
-#{tweet.sender.screen_name}: #{CGI.unescapeHTML(tweet.text)}
+#{tweet.sender.screen_name}: #{unescape(tweet.text)}
         DM
       end
 

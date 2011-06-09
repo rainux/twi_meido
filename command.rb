@@ -51,6 +51,10 @@ module TwiMeido
     end
 
     private
+    def unescape(str)
+      str.gsub('&lt;', '<').gsub('&gt;', '>')
+    end
+
     def extract_error_message(error)
       if error.respond_to? :response_body
         begin
@@ -102,14 +106,14 @@ module TwiMeido
 
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
-#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
+#{tweet.retweeted_status.user.screen_name}: #{unescape(tweet.retweeted_status.text)}#{conversation}
 [ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} #{'[GEO] ' if tweet.retweeted_status.geo.present?}]
 [ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
-#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
+#{tweet.user.screen_name}: #{unescape(tweet.text)}#{conversation}
 [ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
@@ -191,7 +195,7 @@ module TwiMeido
 
       formatted_dm = <<-DM
 DM from #{dm.sender.screen_name} (#{dm.sender.name}):
-#{CGI.unescapeHTML(dm.text)}
+#{unescape(dm.text)}
 [ #{dm_id_info(dm, shorten_id)} ]
       DM
     end
