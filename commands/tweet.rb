@@ -3,7 +3,7 @@ module TwiMeido
     extend Command
 
     define_command :tweet, nil do |user, message|
-      text = message.body.strip
+      text = message.strip
       length = ActiveSupport::Multibyte::Chars.new(text).normalize(:c).length
 
       # FIXME: Place this in a class and freeze it.

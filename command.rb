@@ -23,21 +23,28 @@ module TwiMeido
     end
 
     def process_message(user, message)
-      message_body = message.body.rstrip
-      if message_body =~ CommandLeaderRegex
+      message = message.body.rstrip if message.respond_to? :body
+      result = ''
+      if message =~ CommandLeaderRegex
         @@commands.each do |command|
-          match = message_body.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
+          match = message.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
           if match
             if match.captures.empty?
-              return command.action.call(user, message)
+              result = command.action.call(user, message)
             else
-              return command.action.call(user, message, match)
+              result = command.action.call(user, message, match)
             end
+            break
           end
         end
       else
-        return @@default_command.action.call(user, message)
+        result = @@default_command.action.call(user, message)
       end
+      # XXX: Workaround for ``stack level too deep''
+      user.last_said = message unless message =~ /#{CommandLeaderRegex}!!\Z/
+      user.save
+
+      result
 
     rescue => error
       if error.kind_of?(Grackle::TwitterError) && error.status == 401

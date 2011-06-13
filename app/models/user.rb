@@ -4,6 +4,7 @@ class User
   plugin MongoMapper::Plugins::IdentityMap
 
   key :jabber_id,               String, :index => true
+  key :last_said,               String
   key :request_token,           String
   key :request_token_secret,    String
   key :oauth_token,             String, :index => true
