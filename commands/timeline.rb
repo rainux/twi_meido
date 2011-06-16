@@ -6,11 +6,18 @@ module TwiMeido
       id = params[1]
 
       tweet = user.fetch_tweet(id)
-      TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => tweet.id)
+      begin
+        TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => tweet.id)
+        response = "Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様."
+      rescue Grackle::TwitterError => error
+        if error.status == 403
+          response = "The user is protected, ご主人様."
+        else
+          raise
+        end
+      end
 
-      <<-MESSAGE
-Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様.
-      MESSAGE
+      response
     end
 
     define_command :retweet_with_comment, /\Art\s+(\d+|[a-z]+)(?:\s+(.*))?\Z/im do |user, message, params|
