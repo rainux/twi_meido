@@ -157,6 +157,22 @@ Currently you've turned on #{user.notification.join(' ')}.
     #  "Now tracking users: \"#{user.tracking_keywords_user.join(' ')}\", ご主人様."
     #end
 
+    define_command :filter, /\Afilter(?:\s+(.*))?\Z/i do |user, message, params|
+      keywords = params[1].to_s.split(/\s+/)
+      keywords.each do |keyword|
+        keyword.downcase!
+        if keyword[0] == 45 # '-'
+          user.filter_keywords -= [keyword[1..-1]]
+        else
+          user.filter_keywords += [keyword]
+        end
+      end
+      user.filter_keywords.uniq!
+      user.save
+
+      "Now filtering: \"#{user.filter_keywords.join(' ')}\",　ご主人様."
+    end
+
     define_command :reconnect, /\Areconnect\Z/i do |user, message|
       user.reconnect_user_streams
       'User Streams reconnected, ご主人様.'

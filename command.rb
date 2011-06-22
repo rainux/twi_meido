@@ -273,9 +273,10 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     end
 
     def extract_unread_tweet(tweet)
-      if current_user.notification.include?(:home) ||
+      if !current_user.filtered?(tweet) &&
+        (current_user.notification.include?(:home) ||
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
-        (current_user.notification.include?(:track) && current_user.tracking?(tweet))
+        (current_user.notification.include?(:track) && current_user.tracking?(tweet)))
 
         unless current_user.viewed_tweet_ids.include?(tweet.id)
           User.create_or_update_from_tweet(tweet)

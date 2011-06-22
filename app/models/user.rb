@@ -18,6 +18,7 @@ class User
   key :tracking_keywords,       Array
   key :tracking_keywords_world, Array
   #key :tracking_keywords_user,  Array # Not implemented.
+  key :filter_keywords,         Array
   key :home_was_on,             Integer, :default => -1
   key :viewed_tweet_ids,        Array
   key :last_short_id,           Integer, :default => -1
@@ -191,6 +192,14 @@ class User
   def tracking?(tweet)
     tweet_text = tweet.text.downcase
     found = (tracking_keywords + tracking_keywords_world).select do |keyword|
+      tweet_text.include?(keyword.downcase)
+    end
+    !found.empty?
+  end
+
+  def filtered?(tweet)
+    tweet_text = tweet.text.downcase
+    found = filter_keywords.select do |keyword|
       tweet_text.include?(keyword.downcase)
     end
     !found.empty?
