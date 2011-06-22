@@ -26,24 +26,16 @@ module TwiMeido
 
       tweet = user.fetch_tweet(id)
 
-      text = "#{comment} RT @#{tweet.user.screen_name}: #{tweet.text}"
+      text = "#{comment} RT @#{tweet.user.screen_name}: "
       length = ActiveSupport::Multibyte::Chars.new(text).normalize(:c).length
-
-      case length
-      when 141
-        text = "#{comment}RT @#{tweet.user.screen_name}: #{tweet.text}"
-        length -= 1
-      when 142
-        text = "#{comment}RT @#{tweet.user.screen_name} #{tweet.text}"
-        length -= 2
-      end
 
       if length > 140
         <<-MESSAGE
 Your tweet has #{length} characters which has reached the 140 limitation, ご主人様.
         MESSAGE
-
       else
+        text += tweet.text
+        text = ActiveSupport::Multibyte::Chars.new(text).normalize(:c)[0..139]
         TwiMeido.current_user.update_status!(:status => text)
 
         <<-MESSAGE
