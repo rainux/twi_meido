@@ -128,8 +128,11 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       response
     end
 
-    define_command :home, /\Ahome\Z/i do |user, message|
-      tweets = TwiMeido.current_user.rest_api_client.statuses.home_timeline? :include_entities => true
+    define_command :home, /\Ahome(?:\s+(\d+))?\Z/i do |user, message, params|
+      count = params[1].to_i
+      count = 20 if count.zero?
+
+      tweets = TwiMeido.current_user.rest_api_client.statuses.home_timeline? :include_entities => true, :count => count
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -137,8 +140,11 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :mentions, /\A[@r]\Z/i do |user, message|
-      tweets = TwiMeido.current_user.rest_api_client.statuses.mentions? :include_entities => true
+    define_command :mentions, /\A[@r](?:\s+(\d+))?\Z/i do |user, message, params|
+      count = params[1].to_i
+      count = 20 if count.zero?
+
+      tweets = TwiMeido.current_user.rest_api_client.statuses.mentions? :include_entities => true, :count => count
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -166,10 +172,13 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/i do |user, message, params|
+    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)(?:\s+(\d+))?\Z/i do |user, message, params|
       begin
         screen_name = params[1] ? params[1] : user.screen_name
-        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name, :count => 3) # XXX count changeable?
+        count = params[2].to_i
+        count = 10 if count.zero?
+
+        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name, :count => count)
         tweets.collect! do |tweet|
           format_tweet(tweet)
         end
