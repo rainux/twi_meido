@@ -25,6 +25,9 @@ module TwiMeido
     def process_message(user, message)
       message = message.body.rstrip if message.respond_to? :body
       result = ''
+      # XXX: Workaround for ``stack level too deep''
+      user.last_said = message unless message =~ /#{CommandLeaderRegex}!!\Z/
+      user.save
       if message =~ CommandLeaderRegex
         @@commands.each do |command|
           match = message.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
@@ -40,9 +43,6 @@ module TwiMeido
       else
         result = @@default_command.action.call(user, message)
       end
-      # XXX: Workaround for ``stack level too deep''
-      user.last_said = message unless message =~ /#{CommandLeaderRegex}!!\Z/
-      user.save
 
       result
 
