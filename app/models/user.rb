@@ -206,7 +206,7 @@ class User
     found = (tracking_keywords + tracking_keywords_world).select do |keyword|
       tweet_text.include?(keyword.downcase)
     end
-    (tracking_user.include? tweet.user.screen_name) or !found.empty?
+    (tracking_user.include? tweet.user.screen_name.downcase) or !found.empty?
   end
 
   def filtered?(tweet)
