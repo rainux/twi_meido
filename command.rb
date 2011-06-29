@@ -263,7 +263,9 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     end
 
     def extract_notification(item)
-      if item.entities
+      if item.friends
+        update_friends(item)
+      elsif item.entities
         extract_unread_tweet(item)
       elsif (item.event || item[:delete])
         extract_event(item)
@@ -272,9 +274,18 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       end
     end
 
+    def update_friends(friends)
+      current_user.friends_ids = friends.friends
+      current_user.friends_ids += [current_user.twitter_user_id]
+      current_user.friends_ids.uniq!
+      current_user.save
+
+      nil
+    end
+
     def extract_unread_tweet(tweet)
       if !current_user.filtered?(tweet) &&
-        (current_user.notification.include?(:home) ||
+        ((current_user.notification.include?(:home) && current_user.home_friend?(tweet)) ||
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
         (current_user.notification.include?(:track) && current_user.tracking?(tweet)))
 
@@ -291,7 +302,11 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
 
     def extract_event(event)
       if event.source.present? && event.source.screen_name == current_user.screen_name
-        if event.event == 'block'
+        if event.event == 'follow' # TODO: unfollow?
+          current_user.friends_ids += [event.target.id]
+          current_user.friends_ids.uniq!
+          current_user.save
+        elsif event.event == 'block'
           current_user.blocked_user_ids += [event.target.id]
           current_user.blocked_user_ids.uniq!
           current_user.save

@@ -26,6 +26,7 @@ class User
   key :last_dm_short_id,        Integer, :default => -1
   key :last_mention_id,         Integer
   key :last_dm_id,              Integer
+  key :friends_ids,             Array
   key :blocked_user_ids,        Array
   timestamps!
 
@@ -179,6 +180,17 @@ class User
 
   def update_attributes(attrs = {})
     super(rename_twitter_user_attributes(attrs))
+  end
+
+  def home_friend?(tweet)
+    if !friends_ids.include? tweet.user.id # Twitter would return everything
+      return false
+    end
+    if tweet.in_reply_to_user_id
+      friends_ids.include? tweet.in_reply_to_user_id
+    else
+      true
+    end
   end
 
   def mentioned_by?(tweet)
