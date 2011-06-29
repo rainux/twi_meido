@@ -114,7 +114,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       user.tracking_keywords.uniq!
       user.save
 
-      "Now tracking in home: \"#{user.tracking_keywords.join(' ')}\", ご主人様."
+      "Now tracking in home: \"#{user.tracking_keywords.join(', ')}\", ご主人様."
     end
 
     define_command :world, /\Aworld(?:\s+(.*))?\Z/i do |user, message, params|
@@ -131,31 +131,25 @@ Currently you've turned on #{user.notification.join(' ')}.
       user.save
       user.reconnect_user_streams unless keywords == []
 
-      "Now tracking globally: \"#{user.tracking_keywords_world.join(' ')}\", ご主人様."
+      "Now tracking globally: \"#{user.tracking_keywords_world.join(', ')}\", ご主人様."
     end
 
-    # NOTE: Not implemented by Twitter.
-    #
-    #define_command :user, /\Auser(?:\s+(.*))?\Z/i do |user, message, params|
-    #  keywords = params[1].to_s.split(/\s+/)
-    #  keywords.each do |keyword|
-    #    begin
-    #      result = TwiMeido.current_user.rest_api_client.users.show? :screen_name => keyword.sub(/^-?@?/, '')
-    #      if keyword[0] == 45 # wtf?
-    #        user.tracking_keywords_user -= [result.id]
-    #      else
-    #        user.tracking_keywords_user += [result.id]
-    #      end
-    #    rescue Grackle::TwitterError
-    #      nil
-    #    end
-    #  end
-    #  user.tracking_keywords_user.uniq!
-    #  user.save
-    #  user.reconnect_user_streams unless keywords == []
-    #
-    #  "Now tracking users: \"#{user.tracking_keywords_user.join(' ')}\", ご主人様."
-    #end
+    define_command :user, /\Auser(?:\s+(.*))?\Z/i do |user, message, params|
+      keywords = params[1].to_s.split(/\s+/)
+      keywords.each do |keyword|
+        keyword.downcase!
+        if keyword[0] == 45 # '-'
+          user.tracking_user -= [keyword[1..-1]]
+        else
+          user.tracking_user += [keyword]
+        end
+      end
+      user.tracking_user.uniq!
+      user.save
+      user.reconnect_user_streams unless keywords == []
+
+      "Now tracking users: \"#{user.tracking_user.join(', ')}\", ご主人様."
+    end
 
     define_command :filter, /\Afilter(?:\s+(.*))?\Z/i do |user, message, params|
       keywords = params[1].to_s.split(/\s+/)
@@ -170,7 +164,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       user.filter_keywords.uniq!
       user.save
 
-      "Now filtering: \"#{user.filter_keywords.join(' ')}\",　ご主人様."
+      "Now filtering: \"#{user.filter_keywords.join(', ')}\",　ご主人様."
     end
 
     define_command :reconnect, /\Areconnect\Z/i do |user, message|

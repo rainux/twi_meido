@@ -17,7 +17,7 @@ class User
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
   key :tracking_keywords_world, Array
-  #key :tracking_keywords_user,  Array # Not implemented.
+  key :tracking_user,           Array
   key :filter_keywords,         Array
   key :home_was_on,             Integer, :default => -1
   key :viewed_tweet_ids,        Array
@@ -194,7 +194,7 @@ class User
     found = (tracking_keywords + tracking_keywords_world).select do |keyword|
       tweet_text.include?(keyword.downcase)
     end
-    !found.empty?
+    (tracking_user.include? tweet.user.screen_name) or !found.empty?
   end
 
   def filtered?(tweet)
@@ -206,15 +206,20 @@ class User
   end
 
   def connect_user_streams
+    if !tracking_user.empty? and notification.include? :track
+      params = {:replies => 'all'}
+    else
+      params = {}
+    end
     stream = Twitter::JSONStream.connect(
       :host => 'userstream.twitter.com',
       :path => '/2/user.json',
       :ssl => true,
-      :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
+      :user_agent => "TwiMeido/#{TwiMeido::VERSION}",
       :filters => tracking_keywords_world,
-      #:params => { :follow => tracking_keywords_user },
+      :params => params,
       :oauth => {
-        :consumer_key => AppConfig.twitter.consumer_key,
+        :consumer_key    => AppConfig.twitter.consumer_key,
         :consumer_secret => AppConfig.twitter.consumer_secret,
         :access_key      => oauth_token,
         :access_secret   => oauth_token_secret
