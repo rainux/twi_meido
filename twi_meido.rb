@@ -58,7 +58,7 @@ module TwiMeido
     end
 
     connect_user_streams
-    set_status :available, AppConfig.meido.status_msg
+    set_status :available, AppConfig.meido.status_message
 
     puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
   end

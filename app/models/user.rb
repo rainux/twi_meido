@@ -182,10 +182,16 @@ class User
     super(rename_twitter_user_attributes(attrs))
   end
 
-  def home_friend?(tweet)
-    if !friends_ids.include? tweet.user.id # Twitter would return everything
+  def home_common?(tweet)
+    # NOTE: Twitter says that by supplying ``replies=all'', all @replies *by*
+    #       followings are enabled.
+    #       But actually all @replies *to* followings are enabled too.
+
+    # The tweet is sent by a friend?
+    if !friends_ids.include? tweet.user.id
       return false
     end
+    # The tweet isn't a reply or replied to a friend?
     if tweet.in_reply_to_user_id
       friends_ids.include? tweet.in_reply_to_user_id
     else

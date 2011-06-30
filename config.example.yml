@@ -2,7 +2,7 @@ meido:
   jabber_id:
   password:
   host: 'talk.google.com'
-  status_msg: 'おはよう、ご主人様！'
+  status_message: 'おはよう、ご主人様！'
 
 twitter:
   consumer_key:

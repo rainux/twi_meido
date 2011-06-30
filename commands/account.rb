@@ -105,7 +105,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       keywords = params[1].to_s.split(/\s+/)
       keywords.each do |keyword|
         keyword.downcase!
-        if keyword[0] == 45 # '-'
+        if keyword[0] == '-'.ord
           user.tracking_keywords -= [keyword[1..-1]]
         else
           user.tracking_keywords += [keyword]
@@ -121,7 +121,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       keywords = params[1].to_s.split(/\s+/)
       keywords.each do |keyword|
         keyword.downcase!
-        if keyword[0] == 45 # '-'
+        if keyword[0] == '-'.ord
           user.tracking_keywords_world -= [keyword[1..-1]]
         else
           user.tracking_keywords_world += [keyword]
@@ -138,7 +138,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       keywords = params[1].to_s.split(/\s+/)
       keywords.each do |keyword|
         keyword.downcase!
-        if keyword[0] == 45 # '-'
+        if keyword[0] == '-'.ord
           user.tracking_user -= [keyword[1..-1]]
         else
           user.tracking_user += [keyword]
@@ -155,7 +155,7 @@ Currently you've turned on #{user.notification.join(' ')}.
       keywords = params[1].to_s.split(/\s+/)
       keywords.each do |keyword|
         keyword.downcase!
-        if keyword[0] == 45 # '-'
+        if keyword[0] == '-'.ord
           user.filter_keywords -= [keyword[1..-1]]
         else
           user.filter_keywords += [keyword]
