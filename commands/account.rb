@@ -101,15 +101,13 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :track, /\Atrack(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].to_s.split(/\s+/)
-      keywords.each do |keyword|
-        keyword.downcase!
-        if keyword[0] == '-'.ord
-          user.tracking_keywords -= [keyword[1..-1]]
-        else
-          user.tracking_keywords += [keyword]
-        end
+    define_command :track, /\A(un)?track(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[2].to_s.downcase.split(/\s+/)
+      if un # untrack
+        user.tracking_keywords -= keywords
+      else  # track
+        user.tracking_keywords += keywords
       end
       user.tracking_keywords.uniq!
       user.save
@@ -117,32 +115,13 @@ Currently you've turned on #{user.notification.join(' ')}.
       "Now tracking in home: \"#{user.tracking_keywords.join(', ')}\", ご主人様."
     end
 
-    define_command :world, /\Aworld(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].to_s.split(/\s+/)
-      keywords.each do |keyword|
-        keyword.downcase!
-        if keyword[0] == '-'.ord
-          user.tracking_keywords_world -= [keyword[1..-1]]
-        else
-          user.tracking_keywords_world += [keyword]
-        end
-      end
-      user.tracking_keywords_world.uniq!
-      user.save
-      user.reconnect_user_streams unless keywords == []
-
-      "Now tracking globally: \"#{user.tracking_keywords_world.join(', ')}\", ご主人様."
-    end
-
-    define_command :user, /\Auser(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].to_s.split(/\s+/)
-      keywords.each do |keyword|
-        keyword.downcase!
-        if keyword[0] == '-'.ord
-          user.tracking_user -= [keyword[1..-1]]
-        else
-          user.tracking_user += [keyword]
-        end
+    define_command :oversee, /\A(un)?oversee(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[2].to_s.downcase.split(/\s+/)
+      if un # unoversee
+        user.tracking_user -= keywords
+      else  # oversee
+        user.tracking_user += keywords
       end
       user.tracking_user.uniq!
       user.save
@@ -151,15 +130,13 @@ Currently you've turned on #{user.notification.join(' ')}.
       "Now tracking users: \"#{user.tracking_user.join(', ')}\", ご主人様."
     end
 
-    define_command :filter, /\Afilter(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].to_s.split(/\s+/)
-      keywords.each do |keyword|
-        keyword.downcase!
-        if keyword[0] == '-'.ord
-          user.filter_keywords -= [keyword[1..-1]]
-        else
-          user.filter_keywords += [keyword]
-        end
+    define_command :filter, /\A(un)?filter(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[1].to_s.downcase.split(/\s+/)
+      if un # unfilter
+        user.filter_keywords -= keywords
+      else  # filter
+        user.filter_keywords += keywords
       end
       user.filter_keywords.uniq!
       user.save

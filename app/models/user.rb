@@ -16,7 +16,6 @@ class User
   key :latitude_on,                   Integer, :default => -1
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
-  key :tracking_keywords_world, Array
   key :tracking_user,           Array
   key :filter_keywords,         Array
   key :home_was_on,             Integer, :default => -1
@@ -209,7 +208,7 @@ class User
 
   def tracking?(tweet)
     tweet_text = tweet.text.downcase
-    found = (tracking_keywords + tracking_keywords_world).select do |keyword|
+    found = tracking_keywords.select do |keyword|
       tweet_text.include?(keyword.downcase)
     end
     (tracking_user.include? tweet.user.screen_name.downcase) or !found.empty?
@@ -234,7 +233,6 @@ class User
       :path => '/2/user.json',
       :ssl => true,
       :user_agent => "TwiMeido/#{TwiMeido::VERSION}",
-      :filters => tracking_keywords_world,
       :params => params,
       :oauth => {
         :consumer_key    => AppConfig.twitter.consumer_key,
