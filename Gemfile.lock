@@ -1,10 +1,4 @@
 GIT
-  remote: git://github.com/rainux/hashie.git
-  revision: 853f79aaafa3ec901b18e7ee18318bde61073b4f
-  specs:
-    hashie (0.4.0)
-
-GIT
   remote: git://github.com/rainux/twitter-stream.git
   revision: bab4dc2dd10901808476e0fee4a4e3958a41603a
   specs:
@@ -65,6 +59,7 @@ GEM
       oauth
     guessmethod (0.2.1)
       rake (>= 0.7)
+    hashie (1.0.0)
     hirb (0.3.6)
     httparty (0.7.4)
       crack (= 0.1.8)
@@ -139,7 +134,7 @@ DEPENDENCIES
   geokit
   googl
   grackle
-  hashie!
+  hashie
   irb_rocket
   irbtools
   irbtools-more
