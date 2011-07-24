@@ -1,7 +1,7 @@
 class Tweet
   include MongoMapper::Document
 
-  key :_id, Integer, :index => true, :required => true
+  key :_id, Integer, :index => true
   key :entities, Hashie::Mash
   key :user, Hashie::Mash
   key :retweeted_status, Hashie::Mash

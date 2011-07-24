@@ -1,7 +1,7 @@
 class DirectMessage
   include MongoMapper::Document
 
-  key :_id, Integer, :index => true, :required => true
+  key :_id, Integer, :index => true
   key :sender, Hashie::Mash
 
   class << self
