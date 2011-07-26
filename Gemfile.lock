@@ -10,6 +10,7 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
+    SystemTimer (1.2.3)
     abstract (1.0.0)
     actionpack (3.0.9)
       activemodel (= 3.0.9)
@@ -155,6 +156,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  SystemTimer
   actionpack
   activesupport
   awesome_print

@@ -13,6 +13,9 @@ gem 'actionpack', :require => 'action_view'
 gem 'hashie'
 gem 'yajl-ruby', :require => 'yajl/json_gem'
 gem 'googl'
+platforms :mri_18 do
+  gem 'SystemTimer'
+end
 
 group :development do
   gem 'awesome_print', :require => 'ap'
