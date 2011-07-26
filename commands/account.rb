@@ -101,30 +101,47 @@ Currently you've turned on #{user.notification.join(' ')}.
       end
     end
 
-    define_command :track, /\Atrack(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].to_s.split(/\s+/)
-      user.tracking_keywords += keywords
+    define_command :track, /\A(un)?track(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[2].to_s.downcase.split(/\s+/)
+      if un # untrack
+        user.tracking_keywords -= keywords
+      else  # track
+        user.tracking_keywords += keywords
+      end
       user.tracking_keywords.uniq!
       user.save
-      user.reconnect_user_streams
 
-      <<-MESSAGE
-ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
-Please make sure you've turned track on via command -on track.
-      MESSAGE
+      "Now tracking in home: \"#{user.tracking_keywords.join(', ')}\", ご主人様."
     end
 
-    define_command :untrack, /\Auntrack(?:\s+(.*))?\Z/i do |user, message, params|
-      keywords = params[1].split(/\s+/)
-      user.tracking_keywords -= keywords
-      user.tracking_keywords.uniq!
+    define_command :oversee, /\A(un)?oversee(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[2].to_s.downcase.split(/\s+/)
+      if un # unoversee
+        user.tracking_user -= keywords
+      else  # oversee
+        user.tracking_user += keywords
+      end
+      user.tracking_user.uniq!
       user.save
-      user.reconnect_user_streams
+      user.reconnect_user_streams unless keywords == []
 
-      <<-MESSAGE
-ご主人様, I'll tracking tweets contain "#{user.tracking_keywords.join(' ')}" for you.
-Please make sure you've turned track on via command -on track.
-      MESSAGE
+      "Now tracking users: \"#{user.tracking_user.join(', ')}\", ご主人様."
+    end
+
+    define_command :filter, /\A(un)?filter(?:\s+(.*))?\Z/i do |user, message, params|
+      un = params[1]
+      keywords = params[1].to_s.downcase.split(/\s+/)
+      if un # unfilter
+        user.filter_keywords -= keywords
+      else  # filter
+        user.filter_keywords += keywords
+      end
+      user.filter_keywords.uniq!
+      user.save
+
+      "Now filtering: \"#{user.filter_keywords.join(', ')}\",　ご主人様."
     end
 
     define_command :reconnect, /\Areconnect\Z/i do |user, message|

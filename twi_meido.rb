@@ -4,7 +4,6 @@ require 'rubygems'
 require 'bundler/setup'
 Bundler.require
 require 'active_support/time_with_zone'
-require 'cgi'
 require 'yaml'
 
 MongoMapper.database = 'twi_meido'
@@ -20,6 +19,7 @@ require_relative 'command'
 require_relative 'app/models/user'
 require_relative 'app/models/tweet'
 require_relative 'app/models/directmessage'
+require_relative 'commands/repeat'
 require_relative 'commands/account'
 require_relative 'commands/location'
 require_relative 'commands/timeline'
@@ -53,13 +53,14 @@ module TwiMeido
   setup AppConfig.meido.jabber_id, AppConfig.meido.password, AppConfig.meido.host
 
   when_ready do
-    puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
-
     client.roster.each do |jid, roster_item|
       discover :info, jid, nil
     end
 
     connect_user_streams
+    set_status :available, AppConfig.meido.status_message
+
+    puts "TwiMeido #{AppConfig.meido.jabber_id} ready."
   end
 
   subscription :request? do |s|
@@ -81,6 +82,45 @@ MESSAGE
       send_message(m.from, response)
     }
     EM.defer(operation, callback)
+  end
+
+  class << client
+    def unregister_tmp_handler(id)
+      @tmp_handlers.delete(id.to_s)
+    end
+  end
+
+  status :state => :unavailable do |s|
+    user = User.first_or_create(:jabber_id => s.from.stripped.to_s)
+    stanza = Blather::Stanza::Presence.new
+    stanza.id = stanza.object_id
+    stanza.type = :probe
+    stanza.to = s.from.strip! # Fail w/ resource?
+    timer = EM::Timer.new(2) do
+      client.unregister_tmp_handler stanza.id
+      if user.notification.include? :home
+        user.home_was_on = 1
+        user.notification -= [:home]
+      else
+        user.home_was_on = 0
+      end
+      user.save
+    end
+    callback = lambda {
+      timer.cancel
+    }
+    client.register_tmp_handler stanza.id, &callback
+    client.write stanza
+    true # Ensure the general handler is not called.
+  end
+
+  status do |s|
+    user = User.first_or_create(:jabber_id => s.from.stripped.to_s)
+    if user.home_was_on == 1
+      user.home_was_on = -1
+      user.notification += [:home]
+      user.save
+    end
   end
 
   def self.process_user_stream(item)

@@ -6,11 +6,18 @@ module TwiMeido
       id = params[1]
 
       tweet = user.fetch_tweet(id)
-      TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => tweet.id)
+      begin
+        TwiMeido.current_user.rest_api_client.statuses.retweet!(:id => tweet.id)
+        response = "Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様."
+      rescue Grackle::TwitterError => error
+        if error.status == 403
+          response = "The user is protected, ご主人様."
+        else
+          raise
+        end
+      end
 
-      <<-MESSAGE
-Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様.
-      MESSAGE
+      response
     end
 
     define_command :retweet_with_comment, /\Art\s+(\d+|[a-z]+)(?:\s+(.*))?\Z/im do |user, message, params|
@@ -19,24 +26,16 @@ Successfully retweeted tweet #{id_info(tweet, true)}, ご主人様.
 
       tweet = user.fetch_tweet(id)
 
-      text = "#{comment} RT @#{tweet.user.screen_name}: #{tweet.text}"
+      text = "#{comment} RT @#{tweet.user.screen_name}: "
       length = ActiveSupport::Multibyte::Chars.new(text).normalize(:c).length
-
-      case length
-      when 141
-        text = "#{comment}RT @#{tweet.user.screen_name}: #{tweet.text}"
-        length -= 1
-      when 142
-        text = "#{comment}RT @#{tweet.user.screen_name} #{tweet.text}"
-        length -= 2
-      end
 
       if length > 140
         <<-MESSAGE
 Your tweet has #{length} characters which has reached the 140 limitation, ご主人様.
         MESSAGE
-
       else
+        text += tweet.text
+        text = ActiveSupport::Multibyte::Chars.new(text).normalize(:c)[0..139]
         TwiMeido.current_user.update_status!(:status => text)
 
         <<-MESSAGE
@@ -129,8 +128,11 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       response
     end
 
-    define_command :home, /\Ahome\Z/i do |user, message|
-      tweets = TwiMeido.current_user.rest_api_client.statuses.home_timeline? :include_entities => true
+    define_command :home, /\Ahome(?:\s+(\d+))?\Z/i do |user, message, params|
+      count = params[1].to_i
+      count = 20 if count.zero?
+
+      tweets = TwiMeido.current_user.rest_api_client.statuses.home_timeline? :include_entities => true, :count => count
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -138,8 +140,11 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :mentions, /\A[@r]\Z/i do |user, message|
-      tweets = TwiMeido.current_user.rest_api_client.statuses.mentions? :include_entities => true
+    define_command :mentions, /\A[@r](?:\s+(\d+))?\Z/i do |user, message, params|
+      count = params[1].to_i
+      count = 20 if count.zero?
+
+      tweets = TwiMeido.current_user.rest_api_client.statuses.mentions? :include_entities => true, :count => count
       tweets.collect! do |tweet|
         format_tweet(tweet)
       end
@@ -151,7 +156,7 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets = TwiMeido.current_user.rest_api_client.direct_messages?
       tweets.collect! do |tweet|
         <<-DM
-#{tweet.sender.screen_name}: #{CGI.unescapeHTML(tweet.text)}
+#{tweet.sender.screen_name}: #{unescape(tweet.text)}
         DM
       end
 
@@ -167,10 +172,13 @@ Successfully replied to all mentioned users of #{in_reply_to_tweet.user.screen_n
       tweets.reverse.join("\n")
     end
 
-    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)\Z/i do |user, message, params|
+    define_command :profile, /\A(?:me|profile(?:\s+(\S+))?)(?:\s+(\d+))?\Z/i do |user, message, params|
       begin
         screen_name = params[1] ? params[1] : user.screen_name
-        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name, :count => 3) # XXX count changeable?
+        count = params[2].to_i
+        count = 10 if count.zero?
+
+        tweets = TwiMeido.current_user.rest_api_client.statuses.user_timeline?(:screen_name => screen_name, :count => count)
         tweets.collect! do |tweet|
           format_tweet(tweet)
         end

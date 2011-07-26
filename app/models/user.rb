@@ -4,6 +4,7 @@ class User
   plugin MongoMapper::Plugins::IdentityMap
 
   key :jabber_id,               String, :index => true
+  key :last_said,               String
   key :request_token,           String
   key :request_token_secret,    String
   key :oauth_token,             String, :index => true
@@ -15,12 +16,16 @@ class User
   key :latitude_on,                   Integer, :default => -1
   key :notification,            Array, :default => [:mention, :dm, :event]
   key :tracking_keywords,       Array
+  key :tracking_user,           Array
+  key :filter_keywords,         Array
+  key :home_was_on,             Integer, :default => -1
   key :viewed_tweet_ids,        Array
   key :last_short_id,           Integer, :default => -1
   key :viewed_dm_ids,           Array
   key :last_dm_short_id,        Integer, :default => -1
   key :last_mention_id,         Integer
   key :last_dm_id,              Integer
+  key :friends_ids,             Array
   key :blocked_user_ids,        Array
   timestamps!
 
@@ -176,6 +181,23 @@ class User
     super(rename_twitter_user_attributes(attrs))
   end
 
+  def home_common?(tweet)
+    # NOTE: Twitter says that by supplying ``replies=all'', all @replies *by*
+    #       followings are enabled.
+    #       But actually all @replies *to* followings are enabled too.
+
+    # The tweet is sent by a friend?
+    if !friends_ids.include? tweet.user.id
+      return false
+    end
+    # The tweet isn't a reply or replied to a friend?
+    if tweet.in_reply_to_user_id
+      friends_ids.include? tweet.in_reply_to_user_id
+    else
+      true
+    end
+  end
+
   def mentioned_by?(tweet)
     result = tweet.entities.user_mentions.collect(&:id).include?(twitter_user_id)
     if !last_mention_id && result
@@ -186,21 +208,34 @@ class User
 
   def tracking?(tweet)
     tweet_text = tweet.text.downcase
-    found = tracking_keywords.select do|keyword|
+    found = tracking_keywords.select do |keyword|
+      tweet_text.include?(keyword.downcase)
+    end
+    (tracking_user.include? tweet.user.screen_name.downcase) or !found.empty?
+  end
+
+  def filtered?(tweet)
+    tweet_text = tweet.text.downcase
+    found = filter_keywords.select do |keyword|
       tweet_text.include?(keyword.downcase)
     end
     !found.empty?
   end
 
   def connect_user_streams
+    if !tracking_user.empty? and notification.include? :track
+      params = {:replies => 'all'}
+    else
+      params = {}
+    end
     stream = Twitter::JSONStream.connect(
       :host => 'userstream.twitter.com',
       :path => '/2/user.json',
       :ssl => true,
-      :user_agent => "TwiMeido v#{TwiMeido::VERSION}",
-      # :filters => tracking_keywords,
+      :user_agent => "TwiMeido/#{TwiMeido::VERSION}",
+      :params => params,
       :oauth => {
-        :consumer_key => AppConfig.twitter.consumer_key,
+        :consumer_key    => AppConfig.twitter.consumer_key,
         :consumer_secret => AppConfig.twitter.consumer_secret,
         :access_key      => oauth_token,
         :access_secret   => oauth_token_secret
