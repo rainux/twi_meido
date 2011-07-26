@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'twi_meido'
+require 'irb'
+
+MongoMapper.connection.instance_variable_set(:@logger, Logger.new(STDOUT))
+IRB.start
