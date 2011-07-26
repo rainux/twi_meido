@@ -23,21 +23,28 @@ module TwiMeido
     end
 
     def process_message(user, message)
-      message_body = message.body.rstrip
-      if message_body =~ CommandLeaderRegex
+      message = message.body.rstrip if message.respond_to? :body
+      result = ''
+      # XXX: Workaround for ``stack level too deep''
+      user.last_said = message unless message =~ /#{CommandLeaderRegex}!!\Z/
+      user.save
+      if message =~ CommandLeaderRegex
         @@commands.each do |command|
-          match = message_body.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
+          match = message.lstrip.gsub(CommandLeaderRegex, '').match(command.pattern)
           if match
             if match.captures.empty?
-              return command.action.call(user, message)
+              result = command.action.call(user, message)
             else
-              return command.action.call(user, message, match)
+              result = command.action.call(user, message, match)
             end
+            break
           end
         end
       else
-        return @@default_command.action.call(user, message)
+        result = @@default_command.action.call(user, message)
       end
+
+      result
 
     rescue => error
       if error.kind_of?(Grackle::TwitterError) && error.status == 401
@@ -51,6 +58,10 @@ module TwiMeido
     end
 
     private
+    def unescape(str)
+      str.gsub('&lt;', '<').gsub('&gt;', '>')
+    end
+
     def extract_error_message(error)
       if error.respond_to? :response_body
         begin
@@ -102,14 +113,14 @@ module TwiMeido
 
       if tweet.retweeted_status.present?
         formatted_tweet = <<-TWEET
-#{tweet.retweeted_status.user.screen_name}: #{CGI.unescapeHTML(tweet.retweeted_status.text)}#{conversation}
+#{tweet.retweeted_status.user.screen_name}: #{unescape(tweet.retweeted_status.text)}#{conversation}
 [ #{id_info(tweet.retweeted_status, shorten_id)} | #{time_info(tweet.retweeted_status)}via #{strip_tags(tweet.retweeted_status.source)} #{'[GEO] ' if tweet.retweeted_status.geo.present?}]
 [ #{id_info(tweet, shorten_id)} | Retweeted by #{tweet.user.screen_name} #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
       elsif tweet.user.present?
         formatted_tweet = <<-TWEET
-#{tweet.user.screen_name}: #{CGI.unescapeHTML(tweet.text)}#{conversation}
+#{tweet.user.screen_name}: #{unescape(tweet.text)}#{conversation}
 [ #{id_info(tweet, shorten_id)} | #{time_info(tweet)}via #{strip_tags(tweet.source)} #{'[GEO] ' if tweet.geo.present?}]
         TWEET
 
@@ -191,7 +202,7 @@ module TwiMeido
 
       formatted_dm = <<-DM
 DM from #{dm.sender.screen_name} (#{dm.sender.name}):
-#{CGI.unescapeHTML(dm.text)}
+#{unescape(dm.text)}
 [ #{dm_id_info(dm, shorten_id)} ]
       DM
     end
@@ -252,7 +263,9 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
     end
 
     def extract_notification(item)
-      if item.entities
+      if item.friends
+        update_friends(item)
+      elsif item.entities
         extract_unread_tweet(item)
       elsif (item.event || item[:delete])
         extract_event(item)
@@ -261,10 +274,20 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
       end
     end
 
+    def update_friends(friends)
+      current_user.friends_ids = friends.friends
+      current_user.friends_ids += [current_user.twitter_user_id]
+      current_user.friends_ids.uniq!
+      current_user.save
+
+      nil
+    end
+
     def extract_unread_tweet(tweet)
-      if current_user.notification.include?(:home) ||
+      if !current_user.filtered?(tweet) &&
+        ((current_user.notification.include?(:home) && current_user.home_common?(tweet)) ||
         (current_user.notification.include?(:mention) && current_user.mentioned_by?(tweet)) ||
-        (current_user.notification.include?(:track) && current_user.tracking?(tweet))
+        (current_user.notification.include?(:track) && current_user.tracking?(tweet)))
 
         unless current_user.viewed_tweet_ids.include?(tweet.id)
           User.create_or_update_from_tweet(tweet)
@@ -279,7 +302,11 @@ Tweets per day: #{'%.2f' % (user.statuses_count.to_f / (Time.now.to_date - Time.
 
     def extract_event(event)
       if event.source.present? && event.source.screen_name == current_user.screen_name
-        if event.event == 'block'
+        if event.event == 'follow' # TODO: unfollow?
+          current_user.friends_ids += [event.target.id]
+          current_user.friends_ids.uniq!
+          current_user.save
+        elsif event.event == 'block'
           current_user.blocked_user_ids += [event.target.id]
           current_user.blocked_user_ids.uniq!
           current_user.save
