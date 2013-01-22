@@ -2,6 +2,10 @@
 
 TwiMeido is a Twitter client for XMPP clients, e.g. Google Talk. TwiMeido use Twitter Streaming API to monitor and notify the tweets you're interested nearly real-time.
 
+# May won't be maintained
+
+As I no longer have enough interests in Twitter, this project may won't be maintained. You can checkout [Jimmy Xu's fork](https://github.com/jimmyxu/twimeido) for updates such as Ruby 1.9 and Twitter REST API 1.1 support.
+
 ## Contributing to TwiMeido
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
